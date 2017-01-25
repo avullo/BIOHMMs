@@ -1,2 +1,5 @@
 # BIOHMMs
-An implementation of non-causal input-output HMMs for probabilistic sequence modeling
+An implementation of non-causal input-output HMMs for probabilistic sequence modeling.
+
+A bidirectional IOHMM is a non-causal model of a stochastic translation defined on a space of finite sequences. Like IOHMMs, the model describes the conditional probability distribution P (Y |U), where U = U1, U2, .. , UT is a generic input sequence and Y = Y1, Y2, ..., YT the corresponding output sequence. The model is based on two Markov sequences of hidden state variables, denoted by F and B, respectively. For each time step, F(t) and B(t) are discrete variables with realizations (states) in {f1 , ..., fn } and {b1 , ..., bm }, respectively. As in HMMs, F(t) is assumed to have a causal impact on the next state F(t+1). Hence, F(t) stores contextual information contained on the left of t (propagated in the forward direction). Symmetrically, B(t) is assumed to have a causal impact on the state B(t−1) , thus summarizing information contained on the right of t (propagated in the backward direction). 
+
