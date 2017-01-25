@@ -29,7 +29,9 @@ information contained on the right of t (propagated in the backward direction).
 ## References
 
 P. Baldi, S. Brunak, P. Frasconi, G. Soda and G. Pollastri. "Exploiting the Past and the Future in Protein Secondary Structure Prediction", *Bioinformatics*, 15, 937-946, 1999.
+
 Y. Bengio and P. Frasconi. Input-output HMM’s for sequence processing. *IEEE Trans. on Neural Networks*, 7:1231–1249, 1996.
+
 P. Smyth, D. Heckerman, and M. I. Jordan. Probabilistic independence networks for hidden markov probability models. *Neural Computation*, 9(2):227–269, 1997.
 
 
