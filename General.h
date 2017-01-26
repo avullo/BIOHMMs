@@ -22,6 +22,7 @@
 #include <fstream>
 #include <iostream>
 #include <cstdio>
+#include <cstdlib>
 //#include <values.h>
 
 
