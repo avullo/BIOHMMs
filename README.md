@@ -34,4 +34,25 @@ Y. Bengio and P. Frasconi. Input-output HMM’s for sequence processing. *IEEE T
 
 P. Smyth, D. Heckerman, and M. I. Jordan. Probabilistic independence networks for hidden markov probability models. *Neural Computation*, 9(2):227–269, 1997.
 
+## Repository
 
+L<https://github.com/avullo/BIOHMMs>
+
+## Author
+
+Written by Alessandro Vullo, avullo at ebi.ac.uk.
+
+## Acknowledgements
+
+Thanks to Gianluca Pollastri and Paolo Frasconi.
+
+## Copyright & License
+
+Copyright 2017, Alessandro Vullo, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU GPL version 3.
+
+See LICENSE for more information.
+
+=cut
