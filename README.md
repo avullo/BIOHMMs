@@ -36,7 +36,7 @@ P. Smyth, D. Heckerman, and M. I. Jordan. Probabilistic independence networks fo
 
 ## Repository
 
-L<https://github.com/avullo/BIOHMMs>
+<https://github.com/avullo/BIOHMMs>
 
 ## Author
 
@@ -54,5 +54,3 @@ This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU GPL version 3.
 
 See LICENSE for more information.
-
-=cut
