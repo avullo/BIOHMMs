@@ -8,7 +8,8 @@ void Model::alloc() {
 	
   Conf = new int*[NY];
   for(int y=0; y<NY; ++y)
-    Conf[y] = new int[NY]; 
+    Conf[y] = new int[NY];
+  // TODO: initialise Conf?
 }
 
 Model::Model(int the_NF, int the_NB): NF(the_NF), NB(the_NB) {
@@ -31,6 +32,14 @@ Model::Model(istream& is) {
   Net = new BIOHMM(is);
 
   alloc();
+}
+
+Model::~Model() {
+  for(int y=0; y<NY; ++y)
+    delete[] Conf[y];
+  delete[] Conf;
+
+  delete Net;
 }
 
 void Model::read(istream& is) {
@@ -103,7 +112,8 @@ void Model::predict(Sequence* seq) {
     seq->y_pred[t] = arg;
   }
 
-  for(int t=1; t<=seq->length; +t) {
+  for(int t=1; t<=seq->length; ++t) {
+    // cout << t << ":\t" << seq->y[t] << ',' << seq->y_pred[t] << endl;
     if (seq->y[t] != -1 && seq->y_pred[t] != -1) {
       Conf[seq->y_pred[t]][seq->y[t]]++;
       counted[seq->y[t]]++;
@@ -116,7 +126,7 @@ void Model::predict(Sequence* seq) {
       nerrors_[seq->y[t]]++;
     }
   }
-
+  
   delete[] I;
   delete[] O;
 }

@@ -36,7 +36,7 @@ class Model {
 
   Model(int NF, int NB);
   Model(std::istream& is);
-
+  ~Model();
   void read(std::istream& is);
   void write(std::ostream& os);
   
