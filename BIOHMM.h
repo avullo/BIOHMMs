@@ -30,8 +30,6 @@ class BIOHMM {
 
   void extimation(int*, int*, int);
   void maximization(Float = .1, Float = .05);
-
-  void Feed(int*, int);
   void predict(int*, int);
 
   Float* out() { return Y; }

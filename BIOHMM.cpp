@@ -465,7 +465,7 @@ void BIOHMM::printTables() {
   }
 }
 
-void BIOHMM::Feed(int* seq, int length) {
+void BIOHMM::predict(int* seq, int length) {
   // initialise tree
   tree_alloc(length);
   attachCPT(length); // attach CPTs to all tables
@@ -482,12 +482,6 @@ void BIOHMM::Feed(int* seq, int length) {
   // deallocate tree
   tree_dealloc(length);
 }
-
-
-void BIOHMM::predict(int* seq, int length) {
-  Feed(seq,length);
-}
-
 
 /*****************
   Private methods
