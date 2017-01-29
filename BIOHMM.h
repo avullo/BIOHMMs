@@ -25,8 +25,6 @@ class BIOHMM {
   ~BIOHMM();
   void read(std::istream& is);
   void write(std::ostream& os);
-  void propagate(int);
-  void sufficientStats(int);
 
   void extimation(int*, int*, int);
   void maximization(Float = .1, Float = .05);
@@ -104,6 +102,7 @@ class BIOHMM {
   Float*** P_FFIss;
   Float*** P_BBIss;
 
+  // the output
   Float* Y;
 
   double error;
@@ -130,6 +129,9 @@ class BIOHMM {
 
   void injectOut(int* y, int length);
   void injectIn(int* x, int length);
+
+  void propagate(int);
+  void sufficientStats(int);
 
   void saveOutput(int length);
   

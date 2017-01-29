@@ -58,285 +58,6 @@ void BIOHMM::write(ostream& os) {
   writeTables(os);
 }
 
-
-void BIOHMM::propagate(int length) {
-  int t,i,f,f1,b,b1,o;
-
-  for (t=1;t<=length;t++) {
-    //marginalise F1FBI down to FBI
-    for (i=0;i<NI;i++) {
-      for (b=0;b<NB;b++) {
-	for (f=0;f<NF;f++) {
-	  for (f1=0;f1<NF;f1++) {
-	    FBIa[t][i][b][f] += FFBI[t][i][b][f][f1];
-	  }
-	  mua[t] += FBIa[t][i][b][f];
-	}
-      }
-    }
-    mua[t] = 1.0/mua[t];
-    //multiply OFBI by FBI
-    for (i=0;i<NI;i++) {
-      for (b=0;b<NB;b++) {
-	for (f=0;f<NF;f++) {
-	  for (o=0;o<NO;o++) {
-	    OFBI[t][i][b][f][o] *= FBIa[t][i][b][f]*mua[t];
-	  }
-	}
-      }
-    }
-
-    //marginalise OFBI down to FBI
-    for (i=0;i<NI;i++) {
-      for (b=0;b<NB;b++) {
-	for (f=0;f<NF;f++) {
-	  for (o=0;o<NO;o++) {
-	    FBIb[t][i][b][f] += OFBI[t][i][b][f][o];
-	  }
-	  mub[t] += FBIb[t][i][b][f];
-	}
-      }
-    }
-    mub[t] = 1.0/mub[t];
-
-    //multiply BB1FI by FBI
-    for (i=0;i<NI;i++) {
-      for (f=0;f<NF;f++) {
-	for (b=0;b<NB;b++) {
-	  for (b1=0;b1<NB;b1++) {
-	    BBFI[t][i][f][b][b1] *= FBIb[t][i][b][f]*mub[t];
-	  }
-	}
-      }
-    }
-
-    //marginalise BB1FI down to FB1
-    for (b1=0;b1<NB;b1++) {
-      for (f=0;f<NF;f++) {
-	for (i=0;i<NI;i++) {
-	  for (b=0;b<NB;b++) {
-	    // are we sure this isn't BBFI[t][i][f][b1][b]?
-	    FB1[t][b1][f] += BBFI[t][i][f][b][b1];
-	  }
-	}
-	mu1[t] += FB1[t][b1][f];
-      }
-    }
-    mu1[t] = 1.0/mu1[t];
-
-    //multiply F1FBI by FB1
-    if (t<length) {
-      for (i=0;i<NI;i++) {
-	for (b=0;b<NB;b++) {
-	  for (f=0;f<NF;f++) {
-	    for (f1=0;f1<NF;f1++) {
-	      FFBI[t+1][i][b][f][f1] *= FB1[t][b][f1]*mu1[t];  //tricky: check
-	    }
-	  }
-	}
-      }
-    }
-  }
-
-  /*
-  // reset separators
-  for (i=0;i<NI;i++) {
-  for (b=0;b<NB;b++) {
-  memset(FBIa[i][b],0,NF*sizeof(Float));
-  memset(FBIb[i][b],0,NF*sizeof(Float));
-  }
-  }
-  for (b=0;b<NB;b++) {
-  memset(FB1[b],0,NF*sizeof(Float));
-  }
-  */
-
-  for (t=1;t<=length;t++) {
-    //	error -= log(1/mua[t])+log(1/mub[t])+log(1/mu1[t]);
-    mua[t]=mub[t]=mu1[t]=0;
-  }
-
-  Float temp=0;
-  // do it the other way around
-  // here it seems it's doing like the known message passing,
-  // dividing the new separator potential values by the old
-  // perhaps it should be done in the previous passage as well?!
-  for (t=1;t<=length;t++) {
-    //marginalise BB1FI down to FBI
-    for (i=0;i<NI;i++) {
-      for (f=0;f<NF;f++) {
-	for (b=0;b<NB;b++) {
-	  temp=0;
-	  for (b1=0;b1<NB;b1++) {
-	    temp += BBFI[t][i][f][b][b1];
-	  }
-	  if (FBIb[t][i][b][f]!=0)
-	    FBIb[t][i][b][f] = temp/FBIb[t][i][b][f];
-	  mub[t] += FBIb[t][i][b][f];
-	}
-      }
-    }
-    mub[t] = 1.0/mub[t];
-    //multiply OFBI by FBI
-    for (i=0;i<NI;i++) {
-      for (b=0;b<NB;b++) {
-	for (f=0;f<NF;f++) {
-	  for (o=0;o<NO;o++) {
-	    OFBI[t][i][b][f][o] *= FBIb[t][i][b][f]*mub[t];
-	    //cout << OFBI[t][i][b][f][o] << ' ';
-	  }
-	}
-      }
-    }
-
-    //marginalise OFBI down to FBI
-    for (i=0;i<NI;i++) {
-      for (b=0;b<NB;b++) {
-	for (f=0;f<NF;f++) {
-	  temp=0;
-	  for (o=0;o<NO;o++) {
-	    temp += OFBI[t][i][b][f][o];
-	  }
-	  if (FBIa[t][i][b][f]!=0)
-	    FBIa[t][i][b][f] = temp/FBIa[t][i][b][f];
-	  mua[t] += FBIa[t][i][b][f];
-	}
-      }
-    }
-    mua[t] = 1.0/mua[t];
-    //multiply F1FBI by FBI
-    for (i=0;i<NI;i++) {
-      for (b=0;b<NB;b++) {
-	for (f=0;f<NF;f++) {
-	  for (f1=0;f1<NF;f1++) {
-	    FFBI[t][i][b][f][f1] *= FBIa[t][i][b][f]*mua[t];
-	  }
-	}
-      }
-    }
-    //marginalise F1FBI down to FB1
-    for (b=0;b<NB;b++) {
-      for (f1=0;f1<NF;f1++) {
-	temp=0;
-	for (f=0;f<NF;f++) {
-	  for (i=0;i<NI;i++) {
-	    temp += FFBI[t][i][b][f][f1];
-	  }
-	}
-	//				cout << temp << " " << flush;
-	if (FB1[t][b][f1]!=0)
-	  FB1[t][b][f1] = temp/FB1[t][b][f1];
-	mu1[t] += FB1[t][b][f1];
-      }
-    }
-    mu1[t] = 1.0/mu1[t];
-    //multiply BB1FI by FB1
-    if (t>1) {
-      for (i=0;i<NI;i++) {
-	for (f=0;f<NF;f++) {
-	  for (b=0;b<NB;b++) {
-	    for (b1=0;b1<NB;b1++) {
-	      BBFI[t-1][i][f][b][b1] *= FB1[t][b1][f]*mu1[t];
-	    }
-	  }
-	}
-      }
-    }
-    for (t=1;t<=length;t++) {
-      //	error -= log(1/mua[t])+log(1/mub[t])+log(1/mu1[t]);
-      mua[t]=mub[t]=mu1[t]=0;
-    }
-  }
-
-}
-
-
-
-int max(Float*a,int l) {
-  Float m=0;
-  int ml=-1;
-  for (int g=0;g<l;g++) {
-    if (a[g]>m) {
-      m=a[g];
-      ml=g;
-    }
-  }
-  return ml;
-};
-
-void BIOHMM::sufficientStats(int length) {
-  int t,i,f,f1,b,b1,o;
-  //int imax,bmax,b1max,fmax,f1max,omax;
-  
-  Float* F;Float* F1;Float* B;Float *B1;Float* O;Float* I;
-  F=new Float[NF];
-  F1=new Float[NF];
-  B=new Float[NB];
-  B1=new Float[NB];
-  O=new Float[NO];
-  I=new Float[NI];
-
-  //resetStats();
-
-  for (t=1;t<=length;t++) {
-    memset(F,0,NF*sizeof(Float));
-    memset(F1,0,NF*sizeof(Float));
-    memset(B,0,NB*sizeof(Float));
-    memset(B1,0,NB*sizeof(Float));
-    memset(I,0,NI*sizeof(Float));
-    memset(O,0,NO*sizeof(Float));
-    for (i=0;i<NI;i++) {
-      for (b=0;b<NB;b++) {
-	for (f=0;f<NF;f++) {
-	  for (o=0;o<NO;o++) {
-	    //					if (OFBI[t][i][b][f][o]>max) {
-	    //						max = OFBI[t][i][b][f][o];
-	    F[f] += OFBI[t][i][b][f][o];
-	    B[b] += OFBI[t][i][b][f][o];
-	    I[i] += OFBI[t][i][b][f][o];
-	    O[o] += OFBI[t][i][b][f][o];
-	    //						imax=i;fmax=f;bmax=b;omax=o;
-	    //					}
-	  }
-	}
-      }
-    }
-    //	cout << max << " " << flush;
-    // WARNING, POSSIBLE ERROR
-    // should second index be max(B,NB) and third max(F,NF)?!
-    P_OFBIss[max(I,NI)][max(B,NB)][max(F,NF)][max(O,NO)] += 1.0;
-    //	cout << "r"<<flush;
-    for (i=0;i<NI;i++) {
-      for (f=0;f<NF;f++) {
-	for (f1=0;f1<NF;f1++) {
-	  for (b=1;b<NB;b++) {
-	    F1[f1] += FFBI[t][i][b][f][f1];
-	  }
-	}
-      }
-    }
-    P_FFIss[max(I,NI)][max(F,NF)][max(F1,NF)] += 1.0;
-    for (i=0;i<NI;i++) {
-      for (b=0;b<NB;b++) {
-	for (b1=0;b1<NB;b1++) {
-	  for (f=1;f<NF;f++) {
-	    B1[b1] += BBFI[t][i][f][b][b1];
-	  }
-	}
-      }
-    }
-    P_BBIss[max(I,NI)][max(B,NB)][max(B1,NB)] += 1.0;
-  }
-
-  delete[] F;
-  delete[] F1;
-  delete[] B;
-  delete[] B1;
-  delete[] O;
-  delete[] I;
-
-}
-
 void BIOHMM::extimation(int *seq, int* y, int length) {
   // initialise tree
   tree_alloc(length);
@@ -1003,8 +724,283 @@ BIOHMM::injectIn(int* x, int length) {
   }
 } // injectIn
 
+void BIOHMM::propagate(int length) {
+  int t,i,f,f1,b,b1,o;
+
+  for (t=1;t<=length;t++) {
+    //marginalise F1FBI down to FBI
+    for (i=0;i<NI;i++) {
+      for (b=0;b<NB;b++) {
+	for (f=0;f<NF;f++) {
+	  for (f1=0;f1<NF;f1++) {
+	    FBIa[t][i][b][f] += FFBI[t][i][b][f][f1];
+	  }
+	  mua[t] += FBIa[t][i][b][f];
+	}
+      }
+    }
+    mua[t] = 1.0/mua[t];
+    //multiply OFBI by FBI
+    for (i=0;i<NI;i++) {
+      for (b=0;b<NB;b++) {
+	for (f=0;f<NF;f++) {
+	  for (o=0;o<NO;o++) {
+	    OFBI[t][i][b][f][o] *= FBIa[t][i][b][f]*mua[t];
+	  }
+	}
+      }
+    }
+
+    //marginalise OFBI down to FBI
+    for (i=0;i<NI;i++) {
+      for (b=0;b<NB;b++) {
+	for (f=0;f<NF;f++) {
+	  for (o=0;o<NO;o++) {
+	    FBIb[t][i][b][f] += OFBI[t][i][b][f][o];
+	  }
+	  mub[t] += FBIb[t][i][b][f];
+	}
+      }
+    }
+    mub[t] = 1.0/mub[t];
+
+    //multiply BB1FI by FBI
+    for (i=0;i<NI;i++) {
+      for (f=0;f<NF;f++) {
+	for (b=0;b<NB;b++) {
+	  for (b1=0;b1<NB;b1++) {
+	    BBFI[t][i][f][b][b1] *= FBIb[t][i][b][f]*mub[t];
+	  }
+	}
+      }
+    }
+
+    //marginalise BB1FI down to FB1
+    for (b1=0;b1<NB;b1++) {
+      for (f=0;f<NF;f++) {
+	for (i=0;i<NI;i++) {
+	  for (b=0;b<NB;b++) {
+	    // are we sure this isn't BBFI[t][i][f][b1][b]?
+	    FB1[t][b1][f] += BBFI[t][i][f][b][b1];
+	  }
+	}
+	mu1[t] += FB1[t][b1][f];
+      }
+    }
+    mu1[t] = 1.0/mu1[t];
+
+    //multiply F1FBI by FB1
+    if (t<length) {
+      for (i=0;i<NI;i++) {
+	for (b=0;b<NB;b++) {
+	  for (f=0;f<NF;f++) {
+	    for (f1=0;f1<NF;f1++) {
+	      FFBI[t+1][i][b][f][f1] *= FB1[t][b][f1]*mu1[t];  //tricky: check
+	    }
+	  }
+	}
+      }
+    }
+  }
+
+  /*
+  // reset separators
+  for (i=0;i<NI;i++) {
+  for (b=0;b<NB;b++) {
+  memset(FBIa[i][b],0,NF*sizeof(Float));
+  memset(FBIb[i][b],0,NF*sizeof(Float));
+  }
+  }
+  for (b=0;b<NB;b++) {
+  memset(FB1[b],0,NF*sizeof(Float));
+  }
+  */
+
+  for (t=1;t<=length;t++) {
+    //	error -= log(1/mua[t])+log(1/mub[t])+log(1/mu1[t]);
+    mua[t]=mub[t]=mu1[t]=0;
+  }
+
+  Float temp=0;
+  // do it the other way around
+  // here it seems it's doing like the known message passing,
+  // dividing the new separator potential values by the old
+  // perhaps it should be done in the previous passage as well?!
+  for (t=1;t<=length;t++) {
+    //marginalise BB1FI down to FBI
+    for (i=0;i<NI;i++) {
+      for (f=0;f<NF;f++) {
+	for (b=0;b<NB;b++) {
+	  temp=0;
+	  for (b1=0;b1<NB;b1++) {
+	    temp += BBFI[t][i][f][b][b1];
+	  }
+	  if (FBIb[t][i][b][f]!=0)
+	    FBIb[t][i][b][f] = temp/FBIb[t][i][b][f];
+	  mub[t] += FBIb[t][i][b][f];
+	}
+      }
+    }
+    mub[t] = 1.0/mub[t];
+    //multiply OFBI by FBI
+    for (i=0;i<NI;i++) {
+      for (b=0;b<NB;b++) {
+	for (f=0;f<NF;f++) {
+	  for (o=0;o<NO;o++) {
+	    OFBI[t][i][b][f][o] *= FBIb[t][i][b][f]*mub[t];
+	    //cout << OFBI[t][i][b][f][o] << ' ';
+	  }
+	}
+      }
+    }
+
+    //marginalise OFBI down to FBI
+    for (i=0;i<NI;i++) {
+      for (b=0;b<NB;b++) {
+	for (f=0;f<NF;f++) {
+	  temp=0;
+	  for (o=0;o<NO;o++) {
+	    temp += OFBI[t][i][b][f][o];
+	  }
+	  if (FBIa[t][i][b][f]!=0)
+	    FBIa[t][i][b][f] = temp/FBIa[t][i][b][f];
+	  mua[t] += FBIa[t][i][b][f];
+	}
+      }
+    }
+    mua[t] = 1.0/mua[t];
+    //multiply F1FBI by FBI
+    for (i=0;i<NI;i++) {
+      for (b=0;b<NB;b++) {
+	for (f=0;f<NF;f++) {
+	  for (f1=0;f1<NF;f1++) {
+	    FFBI[t][i][b][f][f1] *= FBIa[t][i][b][f]*mua[t];
+	  }
+	}
+      }
+    }
+    //marginalise F1FBI down to FB1
+    for (b=0;b<NB;b++) {
+      for (f1=0;f1<NF;f1++) {
+	temp=0;
+	for (f=0;f<NF;f++) {
+	  for (i=0;i<NI;i++) {
+	    temp += FFBI[t][i][b][f][f1];
+	  }
+	}
+	//				cout << temp << " " << flush;
+	if (FB1[t][b][f1]!=0)
+	  FB1[t][b][f1] = temp/FB1[t][b][f1];
+	mu1[t] += FB1[t][b][f1];
+      }
+    }
+    mu1[t] = 1.0/mu1[t];
+    //multiply BB1FI by FB1
+    if (t>1) {
+      for (i=0;i<NI;i++) {
+	for (f=0;f<NF;f++) {
+	  for (b=0;b<NB;b++) {
+	    for (b1=0;b1<NB;b1++) {
+	      BBFI[t-1][i][f][b][b1] *= FB1[t][b1][f]*mu1[t];
+	    }
+	  }
+	}
+      }
+    }
+    for (t=1;t<=length;t++) {
+      //	error -= log(1/mua[t])+log(1/mub[t])+log(1/mu1[t]);
+      mua[t]=mub[t]=mu1[t]=0;
+    }
+  }
+
+}
 
 
+
+int max(Float*a,int l) {
+  Float m=0;
+  int ml=-1;
+  for (int g=0;g<l;g++) {
+    if (a[g]>m) {
+      m=a[g];
+      ml=g;
+    }
+  }
+  return ml;
+};
+
+void BIOHMM::sufficientStats(int length) {
+  int t,i,f,f1,b,b1,o;
+  //int imax,bmax,b1max,fmax,f1max,omax;
+  
+  Float* F;Float* F1;Float* B;Float *B1;Float* O;Float* I;
+  F=new Float[NF];
+  F1=new Float[NF];
+  B=new Float[NB];
+  B1=new Float[NB];
+  O=new Float[NO];
+  I=new Float[NI];
+
+  //resetStats();
+
+  for (t=1;t<=length;t++) {
+    memset(F,0,NF*sizeof(Float));
+    memset(F1,0,NF*sizeof(Float));
+    memset(B,0,NB*sizeof(Float));
+    memset(B1,0,NB*sizeof(Float));
+    memset(I,0,NI*sizeof(Float));
+    memset(O,0,NO*sizeof(Float));
+    for (i=0;i<NI;i++) {
+      for (b=0;b<NB;b++) {
+	for (f=0;f<NF;f++) {
+	  for (o=0;o<NO;o++) {
+	    //					if (OFBI[t][i][b][f][o]>max) {
+	    //						max = OFBI[t][i][b][f][o];
+	    F[f] += OFBI[t][i][b][f][o];
+	    B[b] += OFBI[t][i][b][f][o];
+	    I[i] += OFBI[t][i][b][f][o];
+	    O[o] += OFBI[t][i][b][f][o];
+	    //						imax=i;fmax=f;bmax=b;omax=o;
+	    //					}
+	  }
+	}
+      }
+    }
+    //	cout << max << " " << flush;
+    // WARNING, POSSIBLE ERROR
+    // should second index be max(B,NB) and third max(F,NF)?!
+    P_OFBIss[max(I,NI)][max(B,NB)][max(F,NF)][max(O,NO)] += 1.0;
+    //	cout << "r"<<flush;
+    for (i=0;i<NI;i++) {
+      for (f=0;f<NF;f++) {
+	for (f1=0;f1<NF;f1++) {
+	  for (b=1;b<NB;b++) {
+	    F1[f1] += FFBI[t][i][b][f][f1];
+	  }
+	}
+      }
+    }
+    P_FFIss[max(I,NI)][max(F,NF)][max(F1,NF)] += 1.0;
+    for (i=0;i<NI;i++) {
+      for (b=0;b<NB;b++) {
+	for (b1=0;b1<NB;b1++) {
+	  for (f=1;f<NF;f++) {
+	    B1[b1] += BBFI[t][i][f][b][b1];
+	  }
+	}
+      }
+    }
+    P_BBIss[max(I,NI)][max(B,NB)][max(B1,NB)] += 1.0;
+  }
+
+  delete[] F;
+  delete[] F1;
+  delete[] B;
+  delete[] B1;
+  delete[] O;
+  delete[] I;
+
+}
 
 void BIOHMM::saveOutput(int length) {
   int t,i,o,f,b;
