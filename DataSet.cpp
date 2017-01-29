@@ -4,8 +4,8 @@ using namespace std;
 
 DataSet::DataSet(int the_length): totSize(0), length(the_length), seq(new Sequence*[length]) {}
 
-DataSet::DataSet(istream& is, int quot) {
-  totSize = 0;
+DataSet::DataSet(istream& is, int quot): totSize(0), length(0) {
+  // TODO: check length is > 0
   is >> length;
   
   int foo;
@@ -15,6 +15,7 @@ DataSet::DataSet(istream& is, int quot) {
     seq[p] = new Sequence(is, quot);
     totSize += seq[p]->length;
   }
+  // TODO: check totSize > 0
 };
 
 void DataSet::write(ostream& os) {
@@ -35,7 +36,6 @@ void DataSet::write(char* fname) {
   
   outbuf.close();
 };
-
 
 void DataSet::write_predictions(ostream& os) {
   os << length << endl;
