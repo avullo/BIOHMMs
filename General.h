@@ -28,12 +28,12 @@
 
 #ifdef WANT_ERRNO
 #include <errno.h>
-#define FAULT(s) {cerr << "Error: in function " << __PRETTY_FUNCTION__ \
+#define FAULT(s) { std::cerr << "Error: in function " << __PRETTY_FUNCTION__ \
   << ", file " << __FILE__ << " line " << __LINE__ << ": " << s << "\n" \
   << "errno= " << errno << " (" << strerror(errno) << ")\n"; abort();}
 
 #else
-#define FAULT(s) {cerr << "Error: in function " << __PRETTY_FUNCTION__ \
+#define FAULT(s) { std::cerr << "Error: in function " << __PRETTY_FUNCTION__ \
   << ", file " << __FILE__ << " line " << __LINE__ << ": " << s << "\n" \
   ; abort();}
 #endif
