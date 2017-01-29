@@ -1,30 +1,25 @@
-
-// BIOHMM ver. 1.0 (16/9/2005)
-// Copyright (C) Gianluca Pollastri 2005
-
-
 #include "General.h"
-#include "BIOHMM.h"
+#include "CPTParameterisation.h"
 using namespace std;
 
 /*****************
   Public methods
 ******************/
 
-BIOHMM::BIOHMM(int the_NI, int the_NO, int the_NF, int the_NB): NI(the_NI), NO(the_NO), NF(the_NF), NB(the_NB) {
+CPTParameterisation::CPTParameterisation(int the_NI, int the_NO, int the_NF, int the_NB): NI(the_NI), NO(the_NO), NF(the_NF), NB(the_NB) {
   alloc();
   resetStats();
   initialiseTables();
 }
 
-BIOHMM::BIOHMM(istream& is) {
+CPTParameterisation::CPTParameterisation(istream& is) {
   is >> NI >> NO >> NF >> NB;
   alloc();
   resetStats();
   readTables(is);
 }
 
-BIOHMM::~BIOHMM() {
+CPTParameterisation::~CPTParameterisation() {
   delete[] P_F;
   delete[] P_B;
   delete[] Y;
@@ -45,7 +40,7 @@ BIOHMM::~BIOHMM() {
   }
 }
 
-void BIOHMM::read(istream& is) {
+void CPTParameterisation::read(istream& is) {
   is >> NI >> NO >> NF >> NB;
   // NOTE: why doesn't it allocate?
   readTables(is);
@@ -53,12 +48,12 @@ void BIOHMM::read(istream& is) {
 }
 
 
-void BIOHMM::write(ostream& os) {
+void CPTParameterisation::write(ostream& os) {
   os << NI << ' ' << NO << ' ' << NF << ' ' << NB << endl;
   writeTables(os);
 }
 
-void BIOHMM::extimation(int *seq, int* y, int length) {
+void CPTParameterisation::extimation(int *seq, int* y, int length) {
   // initialise tree
   tree_alloc(length);
   //	attach CPTs to all tables
@@ -81,7 +76,7 @@ void BIOHMM::extimation(int *seq, int* y, int length) {
   tree_dealloc(length);
 }
 
-void BIOHMM::maximization(Float att, Float prior) {
+void CPTParameterisation::maximization(Float att, Float prior) {
   int i,o,f,f1,b,b1;
   Float tot,totF,totB;
   tot=0;totF=0;totB=0;
@@ -132,7 +127,7 @@ void BIOHMM::maximization(Float att, Float prior) {
   //printTables();
 }
 
-void BIOHMM::printStats() {
+void CPTParameterisation::printStats() {
   int i,o,f,f1,b,b1;
   Float tot,totF,totB;
   tot=0;totF=0;totB=0;
@@ -159,7 +154,7 @@ void BIOHMM::printStats() {
   }
 }
 
-void BIOHMM::printTables() {
+void CPTParameterisation::printTables() {
   int i,o,f,f1,b,b1;
   Float tot,totF,totB;
   tot=0;totF=0;totB=0;
@@ -186,7 +181,7 @@ void BIOHMM::printTables() {
   }
 }
 
-void BIOHMM::predict(int* seq, int length) {
+void CPTParameterisation::predict(int* seq, int length) {
   // initialise tree
   tree_alloc(length);
   attachCPT(length); // attach CPTs to all tables
@@ -208,7 +203,7 @@ void BIOHMM::predict(int* seq, int length) {
   Private methods
 ******************/
 
-void BIOHMM::alloc() {
+void CPTParameterisation::alloc() {
   int i,f,b;
 
   P_F = new Float[NF];
@@ -246,7 +241,7 @@ void BIOHMM::alloc() {
 }
 
 
-void BIOHMM::initialiseTables() {
+void CPTParameterisation::initialiseTables() {
   int i,o,f,f1,b,b1;
 
   for (f=0;f<NF;f++) {
@@ -278,7 +273,7 @@ void BIOHMM::initialiseTables() {
   normaliseTables();
 }
 
-void BIOHMM::normaliseTables() {
+void CPTParameterisation::normaliseTables() {
   int i,o,f,f1,b,b1;
   Float tot,totF,totB;
 
@@ -331,7 +326,7 @@ void BIOHMM::normaliseTables() {
   }
 }
 
-void BIOHMM::resetTables() {
+void CPTParameterisation::resetTables() {
   int i,o,f,f1,b,b1;
 
   for (f=0;f<NF;f++) {
@@ -363,7 +358,7 @@ void BIOHMM::resetTables() {
 }
 
 
-void BIOHMM::resetStats() {
+void CPTParameterisation::resetStats() {
   int i,o,f,f1,b,b1;
 
   for (i=0;i<NI;i++) {
@@ -387,7 +382,7 @@ void BIOHMM::resetStats() {
   }
 }
 
-void BIOHMM::readTables(istream& is) {
+void CPTParameterisation::readTables(istream& is) {
   int i,o,f,f1,b,b1;
 
   for (f=0;f<NF;f++) {
@@ -418,7 +413,7 @@ void BIOHMM::readTables(istream& is) {
   }
 }
 
-void BIOHMM::writeTables(ostream& os) {
+void CPTParameterisation::writeTables(ostream& os) {
   int i,o,f,f1,b,b1;
 
   for (f=0;f<NF;f++) {
@@ -455,7 +450,7 @@ void BIOHMM::writeTables(ostream& os) {
   }
 }
 
-void BIOHMM::tree_alloc(int length) {
+void CPTParameterisation::tree_alloc(int length) {
   int t,i,o,f,f1,b,b1;
 
   mua=new Float[length+1];
@@ -537,7 +532,7 @@ void BIOHMM::tree_alloc(int length) {
 } // tree_alloc
 
 
-void BIOHMM::tree_dealloc(int length) {
+void CPTParameterisation::tree_dealloc(int length) {
   int t,i,f,b;
 
   delete[] mua;
@@ -597,7 +592,7 @@ void BIOHMM::tree_dealloc(int length) {
 } // tree_dealloc
 
 
-void BIOHMM::attachPOFBI(int t) {
+void CPTParameterisation::attachPOFBI(int t) {
   int i,o,f,b;
 
   for (i=0;i<NI;i++) {
@@ -613,7 +608,7 @@ void BIOHMM::attachPOFBI(int t) {
   //cout << endl;
 } // attachPOFBI
 
-void BIOHMM::attachPFFI(int t) {
+void CPTParameterisation::attachPFFI(int t) {
   int i,f,f1,b;
 
   for (i=0;i<NI;i++) {
@@ -630,7 +625,7 @@ void BIOHMM::attachPFFI(int t) {
   //cout << endl;
 } // attachPFFI
 
-void BIOHMM::attachPBBI(int t) {
+void CPTParameterisation::attachPBBI(int t) {
   int i,f,b,b1;
 
   for (i=0;i<NI;i++) {
@@ -644,7 +639,7 @@ void BIOHMM::attachPBBI(int t) {
   }
 } // attachPBBI
 
-void BIOHMM::attachPF() {
+void CPTParameterisation::attachPF() {
   int i,f,f1,b;
 
   for (i=0;i<NI;i++) {
@@ -658,7 +653,7 @@ void BIOHMM::attachPF() {
   }
 } // attachPF
 
-void BIOHMM::attachPB(int T) {
+void CPTParameterisation::attachPB(int T) {
   int i,f,b,b1;
 
   for (i=0;i<NI;i++) {
@@ -674,7 +669,7 @@ void BIOHMM::attachPB(int T) {
 
 // this should correspond to the second step of the initialisation
 // procedure of the junction tree for inference
-void BIOHMM::attachCPT(int length) {
+void CPTParameterisation::attachCPT(int length) {
   int t;
   for (t=1;t<=length;t++) {
     attachPOFBI(t);
@@ -689,7 +684,7 @@ void BIOHMM::attachCPT(int length) {
 
 
 void
-BIOHMM::injectOut(int* y, int length) {
+CPTParameterisation::injectOut(int* y, int length) {
   int t,i,o,f,b;
 
   for (t=1;t<=length;t++) {
@@ -707,7 +702,7 @@ BIOHMM::injectOut(int* y, int length) {
 } // injectOut
 
 void
-BIOHMM::injectIn(int* x, int length) {
+CPTParameterisation::injectIn(int* x, int length) {
   int t,i,o,f,b;
 
   for (t=1;t<=length;t++) {
@@ -724,7 +719,7 @@ BIOHMM::injectIn(int* x, int length) {
   }
 } // injectIn
 
-void BIOHMM::propagate(int length) {
+void CPTParameterisation::propagate(int length) {
   int t,i,f,f1,b,b1,o;
 
   for (t=1;t<=length;t++) {
@@ -929,7 +924,7 @@ int max(Float*a,int l) {
   return ml;
 };
 
-void BIOHMM::sufficientStats(int length) {
+void CPTParameterisation::sufficientStats(int length) {
   int t,i,f,f1,b,b1,o;
   //int imax,bmax,b1max,fmax,f1max,omax;
   
@@ -1002,7 +997,7 @@ void BIOHMM::sufficientStats(int length) {
 
 }
 
-void BIOHMM::saveOutput(int length) {
+void CPTParameterisation::saveOutput(int length) {
   int t,i,o,f,b;
   Float tot=0;
 

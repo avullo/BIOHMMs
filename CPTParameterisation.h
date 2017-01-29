@@ -1,11 +1,12 @@
 /*
 
-  A class to represent bidirectional IOHMMs
+  Represents the parameters of the model explicitly,
+  using conditional propabability tables (CPTs)
 
  */
 
-#ifndef BIOHMM_H
-#define BIOHMM_H
+#ifndef CPTPARAMETERISATION_H
+#define CPTPARAMETERISATION_H
 
 #include <cstdlib>
 #include <cmath>
@@ -13,16 +14,12 @@
 
 #define MAX 2500
 
-
-// BIOHMM ver. 1.0 (16/9/2005)
-// Copyright (C) Gianluca Pollastri 2005
-
-class BIOHMM {
+class CPTParameterisation {
  public:
 
-  BIOHMM(int, int, int, int);
-  BIOHMM(std::istream& is);
-  ~BIOHMM();
+  CPTParameterisation(int, int, int, int);
+  CPTParameterisation(std::istream& is);
+  ~CPTParameterisation();
   void read(std::istream& is);
   void write(std::ostream& os);
 
@@ -102,7 +99,7 @@ class BIOHMM {
   Float*** P_FFIss;
   Float*** P_BBIss;
 
-  // the output
+  // the output after E-step (to check the error) and prediction
   Float* Y;
 
   double error;
@@ -113,8 +110,8 @@ class BIOHMM {
   void resetTables();
   void resetStats();
   void printStats();
-  void printTables();
   void readTables(std::istream& is);
+  void printTables();
   void writeTables(std::ostream& os);
 
   void tree_alloc(int length);
@@ -138,4 +135,4 @@ class BIOHMM {
 };
 
 
-#endif // BIOHMM_H
+#endif // CPTPARAMETERISATION_H
