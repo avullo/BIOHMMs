@@ -18,6 +18,27 @@
 // Copyright (C) Gianluca Pollastri 2005
 
 class BIOHMM {
+ public:
+
+  BIOHMM(int, int, int, int);
+  BIOHMM(std::istream& is);
+  ~BIOHMM();
+  void read(std::istream& is);
+  void write(std::ostream& os);
+  void propagate(int);
+  void sufficientStats(int);
+
+  void extimation(int*, int*, int);
+  void maximization(Float = .1, Float = .05);
+
+  void Feed(int*, int);
+  void predict(int*, int);
+
+  Float* out() { return Y; }
+  Float getError() { return error; }
+  void resetError() { error =.0; }
+
+ private:
   /*
     Input, output and forward/backward states are multinomial random variables
     Store the number of values for each of them.
@@ -113,26 +134,6 @@ class BIOHMM {
   void injectIn(int* x, int length);
 
   void saveOutput(int length);
-
- public:
-
-  BIOHMM(int NI, int NO, int NF, int NB);
-  BIOHMM(std::istream& is);
-  ~BIOHMM();
-  void read(std::istream& is);
-  void write(std::ostream& os);
-  void propagate(int length);
-  void sufficientStats(int length);
-
-  void extimation(int* seq, int* y, int length);
-  void maximization(Float att=0.1, Float prior=0.05);
-
-  void Feed(int* seq, int length);
-  void predict(int* seq, int length);
-
-  Float* out() { return Y; }
-  Float getError() { return error; }
-  void resetError() { error =.0; }
   
 };
 
