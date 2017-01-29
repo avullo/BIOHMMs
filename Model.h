@@ -4,8 +4,7 @@
 #include <cstdlib>
 #include <cmath>
 #include "Sequence.h"
-#include "BIOHMM.h"
-
+#include "CPTParameterisation.h"
 
 class Model {
   int NU;
@@ -16,7 +15,7 @@ class Model {
 
   Float threshold;
 
-  BIOHMM* Net;
+  CPTParameterisation* model;
 
   int** Conf;
 
@@ -45,7 +44,7 @@ class Model {
   void maximization(Float att = 0.1, Float prior = .05);
 
   void predict(Sequence* seq);
-  Float* out() { return Net->out(); } 
+  Float* out() { return model->out(); } 
   int** getConf() { return  Conf; }
   int getNErrors() { return nerrors; }
   int getNErrors_(int i) { return nerrors_[i]; }
@@ -53,8 +52,8 @@ class Model {
   int* getCounted() { return counted; }
   void resetNErrors();
   Float get_tot_error() { return temp_error; }
-  Float get_squared_error() { return Net->getError(); }
-  void reset_squared_error() { Net->resetError(); }
+  Float get_squared_error() { return model->getError(); }
+  void reset_squared_error() { model->resetError(); }
   
 };
 

@@ -20,7 +20,7 @@ Model::Model(int the_NF, int the_NB): NF(the_NF), NB(the_NB) {
   NU = 27;
   NY = 3;
   
-  Net = new BIOHMM(NU, NY, NF, NB);
+  model = new CPTParameterisation(NU, NY, NF, NB);
 
   alloc();
 }
@@ -29,7 +29,7 @@ Model::Model(istream& is) {
   is >> NU >> NY;
   is >> NF >> NB;
 
-  Net = new BIOHMM(is);
+  model = new CPTParameterisation(is);
 
   alloc();
 }
@@ -39,14 +39,14 @@ Model::~Model() {
     delete[] Conf[y];
   delete[] Conf;
 
-  delete Net;
+  delete model;
 }
 
 void Model::read(istream& is) {
   is >> NU >> NY;
   is >> NF >> NB;
 
-  Net->read(is);
+  model->read(is);
 
   threshold = .0;
 }
@@ -55,7 +55,7 @@ void Model::write(ostream& os) {
   os << NU <<  " " << NY << endl;
   os << NF << " " << NB << endl;
 
-  Net->write(os);
+  model->write(os);
 }
 
 void Model::randomize(int seed) {
@@ -75,14 +75,14 @@ void Model::extimation(Sequence *seq) {
     O[t] = seq->y[t];
   }
 
-  Net->extimation(I, O, seq->length);
+  model->extimation(I, O, seq->length);
 
   delete[] I;
   delete[] O;
 }
 
 void Model::maximization(Float att, Float prior) {
-  Net->maximization(att, prior);
+  model->maximization(att, prior);
 }
 
 void Model::predict(Sequence* seq) {
@@ -97,15 +97,15 @@ void Model::predict(Sequence* seq) {
     O[t] = seq->y[t];
   }
 
-  Net->predict(I, seq->length);
+  model->predict(I, seq->length);
 
   for(int t=1; t<=seq->length; ++t) {
     Float pred = .0;
     int arg = -1;
 
     for(int c=0; c<NY; ++c) {
-      if (Net->out()[NY*t+c] > pred) {
-	pred = Net->out()[NY*t+c];
+      if (model->out()[NY*t+c] > pred) {
+	pred = model->out()[NY*t+c];
 	arg = c;
       }
     }
@@ -140,5 +140,5 @@ void Model::resetNErrors() {
     for(int y=0; y<NY; ++y)
       Conf[p][y] = 0;
 
-  Net->resetError();
+  model->resetError();
 }

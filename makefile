@@ -1,5 +1,5 @@
-OBJECTST = General.o Sequence.o DataSet.o Model.o BIOHMM.o Train.o
-HEADERST = General.h Sequence.h DataSet.h Model.h BIOHMM.h
+OBJECTST = General.o Sequence.o DataSet.o Model.o CPTParameterisation.o Train.o
+HEADERST = General.h Sequence.h DataSet.h Model.h CPTParameterisation.h
 
 CC	= g++
 CFLAGS  = -g
@@ -19,10 +19,10 @@ Sequence.o : Sequence.cpp Sequence.h General.o
 DataSet.o : DataSet.cpp DataSet.h Sequence.h General.h Sequence.o
 	$(CC) -c $(CFLAGS) $*.cpp
 
-BIOHMM.o : BIOHMM.cpp BIOHMM.h General.o
+CPTParameterisation.o : CPTParameterisation.cpp CPTParameterisation.h General.o
 	$(CC) -c $(CFLAGS) $*.cpp
 
-Model.o : Model.cpp Model.h Sequence.o BIOHMM.o
+Model.o : Model.cpp Model.h Sequence.o CPTParameterisation.o
 	$(CC) -c $(CFLAGS) $*.cpp
 
 clean:
