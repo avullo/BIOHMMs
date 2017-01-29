@@ -118,6 +118,7 @@ class BIOHMM {
 
   BIOHMM(int NI, int NO, int NF, int NB);
   BIOHMM(std::istream& is);
+  ~BIOHMM();
   void read(std::istream& is);
   void write(std::ostream& os);
   void propagate(int length);

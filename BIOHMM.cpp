@@ -3,7 +3,7 @@
 // Copyright (C) Gianluca Pollastri 2005
 
 
-
+#include "General.h"
 #include "BIOHMM.h"
 using namespace std;
 
@@ -578,9 +578,30 @@ BIOHMM::BIOHMM(istream& is) {
   readTables(is);
 }
 
+BIOHMM::~BIOHMM() {
+  delete[] P_F;
+  delete[] P_B;
+  delete[] Y;
+
+  for (int i=0; i<NI; ++i) {
+    for (int f=0; f<NF; ++f) {
+      delete[] P_FFI[i][f];
+      delete[] P_FFIss[i][f];
+    }
+    for (int b=0; b<NB; ++b) {
+      delete[] P_BBIss[i][b];
+      
+      for (int f=0; f<NF; ++f) {
+	delete[] P_OFBI[i][b][f];
+	delete[] P_OFBIss[i][b][f];
+      }
+    }
+  }
+}
 
 void BIOHMM::read(istream& is) {
   is >> NI >> NO >> NF >> NB;
+  // NOTE: why doesn't it allocate?
   readTables(is);
   resetStats();
 }
@@ -593,7 +614,7 @@ void BIOHMM::write(ostream& os) {
 
 
 void BIOHMM::propagate(int length) {
-  cout << endl << "--- In Propagate ---" << endl;
+  // cout << endl << "--- In Propagate ---" << endl;
   int t,i,f,f1,b,b1,o;
 
   for (t=1;t<=length;t++) {
@@ -783,17 +804,18 @@ void BIOHMM::propagate(int length) {
     }
   }
 
-  for(int t=1; t<=length; ++t) {
-  for (int i=0;i<NI;i++) {
-      for (int b=0;b<NB;b++) {
-	for (int f=0;f<NF;f++) {
-	  for (int o=0;o<NO;o++) {
-	    cout << OFBI[t][i][b][f][o] << ' ';
-	  }
-	}
-      }
-    }
-  }
+  // for(int t=1; t<=length; ++t) {
+  //   for (int i=0;i<NI;i++) {
+  //     for (int b=0;b<NB;b++) {
+  // 	for (int f=0;f<NF;f++) {
+  // 	  for (int o=0;o<NO;o++) {
+  // 	    cout << OFBI[t][i][b][f][o] << ' ';
+  // 	  }
+  // 	}
+  //     }
+  //   }
+  //   cout << endl;
+  // }
 
 } // propagate
 
@@ -815,7 +837,7 @@ void BIOHMM::sufficientStats(int length) {
   int t,i,f,f1,b,b1,o;
   //int imax,bmax,b1max,fmax,f1max,omax;
 
-  cout << endl << "--- In sufficientStats ---" << endl;
+  // cout << endl << "--- In sufficientStats ---" << endl;
   // for(int t=1; t<=length; ++t) {
   // for (int i=0;i<NI;i++) {
   //     for (int b=0;b<NB;b++) {
@@ -849,7 +871,7 @@ void BIOHMM::sufficientStats(int length) {
       for (b=0;b<NB;b++) {
 	for (f=0;f<NF;f++) {
 	  for (o=0;o<NO;o++) {
-	    cout << OFBI[t][i][b][f][o] << ' ';
+	    //cout << OFBI[t][i][b][f][o] << ' ';
 	    //					if (OFBI[t][i][b][f][o]>max) {
 	    //						max = OFBI[t][i][b][f][o];
 	    F[f] += OFBI[t][i][b][f][o];
@@ -897,7 +919,6 @@ void BIOHMM::sufficientStats(int length) {
   delete[] O;
   delete[] I;
 
-  cout << endl;
 } // sufficientStats
 
 void BIOHMM::extimation(int *seq, int* y, int length) {
@@ -918,18 +939,18 @@ void BIOHMM::extimation(int *seq, int* y, int length) {
   // Propagate evidence
   propagate(length);
 
-  cout << endl << "--- Out Propagate ---" << endl;
-  for(int t=1; t<=length; ++t) {
-  for (int i=0;i<NI;i++) {
-      for (int b=0;b<NB;b++) {
-	for (int f=0;f<NF;f++) {
-	  for (int o=0;o<NO;o++) {
-	    cout << OFBI[t][i][b][f][o] << ' ';
-	  }
-	}
-      }
-    }
-  }
+  // cout << endl << "--- Out Propagate ---" << endl;
+  // for(int t=1; t<=length; ++t) {
+  // for (int i=0;i<NI;i++) {
+  //     for (int b=0;b<NB;b++) {
+  // 	for (int f=0;f<NF;f++) {
+  // 	  for (int o=0;o<NO;o++) {
+  // 	    cout << OFBI[t][i][b][f][o] << ' ';
+  // 	  }
+  // 	}
+  //     }
+  //   }
+  // }
   
   // Collect and store sufficient stats for all tables
   sufficientStats(length);
@@ -1074,6 +1095,6 @@ void BIOHMM::Feed (int* seq, int length) {
 
 
 void BIOHMM::predict(int* seq, int length) {
-  Feed(seq,length);
+  Feed(seq,length); //
 }
 
