@@ -67,6 +67,9 @@ void Model::extimation(Sequence *seq) {
   int* I;
   int* O;
 
+  // NOTE
+  // Here it makes a copy of the input/output sequence
+  // which seems a waste of time/space
   I = new int[seq->length+1];
   O = new int[seq->length+1];
 
@@ -89,6 +92,10 @@ void Model::predict(Sequence* seq) {
   int* I;
   int* O;
 
+  // NOTE
+  // Here it makes a copy of the input/output sequence
+  // which seems a waste of time/space
+  // It doesn't also seem to be using the output sequence
   I = new int[seq->length+1];
   O = new int[seq->length+1];
 
