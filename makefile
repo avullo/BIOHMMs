@@ -6,6 +6,7 @@ CFLAGS  = -g
 
 Train :	$(OBJECTST) 
 	$(CC) $(CFLAGS) -o $@ $(OBJECTST) $(LLIBS)
+	mv $@ examples/secondary_structure
 
 Train.o : Train.cpp $(HEADERST)
 	$(CC) -c $(CFLAGS) $*.cpp
@@ -26,4 +27,4 @@ Model.o : Model.cpp Model.h Sequence.o CPTParameterisation.o
 	$(CC) -c $(CFLAGS) $*.cpp
 
 clean:
-	rm *.o # Train
+	rm *.o examples/secondary_structure/Train
