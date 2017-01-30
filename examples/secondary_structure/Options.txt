@@ -1,0 +1,13 @@
+epsilon 0.1
+NF      3
+NB      3
+seed    949
+shuffle 0
+batch_blocks 10
+readModel    0
+readEpoch    0
+nEpochs      5
+adaptive     1000
+reload       1
+belief       0
+attenuation	0.9
