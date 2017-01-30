@@ -13,6 +13,7 @@ class DataSet {
   DataSet() {};
   DataSet(int the_length);
   DataSet(std::istream& is, int quot = 0);
+  ~DataSet();
 
   void write(std::ostream& os);
   void write(char* fname);

@@ -18,6 +18,14 @@ DataSet::DataSet(istream& is, int quot): totSize(0), length(0) {
   // TODO: check totSize > 0
 };
 
+DataSet::~DataSet() {
+  for(int p=0; p<length; ++p)
+    if(sequence[p] != NULL)
+      delete seq[p];
+  if(sequence != NULL)
+    delete[] sequence;
+}
+
 void DataSet::write(ostream& os) {
   os << length << endl;
   for(int p=0; p<length; ++p) {

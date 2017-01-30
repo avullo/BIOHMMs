@@ -1,7 +1,7 @@
 #include "Sequence.h"
 using namespace std;
 
-Sequence::Sequence(istream& is, int quot): HePl(0) {
+Sequence::Sequence(istream& is, int quot): alignments_loaded(0), HePl(0) {
   char temp[MAX_T];
 
   if (quot == 0) is >> name;
@@ -29,6 +29,18 @@ Sequence::Sequence(istream& is, int quot): HePl(0) {
       y[i] = translateY[c-'A'];
       if (y[i]<0 || y[i]>26) y[i]=-1;
     }
+}
+
+Sequence::~Sequence() {
+  unload_alignments();
+  
+  if(HePl)
+    unload_profile();
+
+  delete[] app;
+  delete[] y_pred;
+  delete[] y;
+  delete[] u;
 }
 
 int Sequence::load_alignments(char* alidir, int dir) {
@@ -89,8 +101,8 @@ int Sequence::unload_alignments() {
     
     alignments_loaded = 0;
     return 1;
-  }
-  else return 0;
+  } else
+    return 0;
 }
 
 Float Sequence::profile_entropy() {

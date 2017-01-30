@@ -57,7 +57,8 @@ class Sequence {
   int HePl;
 
   Sequence(std::istream& is, int quot = 0);
-
+  ~Sequence();
+  
   int load_alignments(char* alidir, int dir = 0);
   int unload_alignments();
   Float profile_entropy();
