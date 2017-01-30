@@ -20,10 +20,10 @@ DataSet::DataSet(istream& is, int quot): totSize(0), length(0) {
 
 DataSet::~DataSet() {
   for(int p=0; p<length; ++p)
-    if(sequence[p] != NULL)
+    if(seq[p] != NULL)
       delete seq[p];
-  if(sequence != NULL)
-    delete[] sequence;
+  if(seq != NULL)
+    delete[] seq;
 }
 
 void DataSet::write(ostream& os) {
