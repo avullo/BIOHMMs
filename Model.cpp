@@ -63,7 +63,7 @@ void Model::randomize(int seed) {
   //NetF->initWeights(seed);
 }
 
-void Model::extimation(Sequence *seq) {
+void Model::extimation(Instance *seq) {
   int* I;
   int* O;
 
@@ -88,7 +88,7 @@ void Model::maximization(Float att, Float prior) {
   model->maximization(att, prior);
 }
 
-void Model::predict(Sequence* seq) {
+void Model::predict(Instance* seq) {
   int* I;
   int* O;
 

@@ -1,7 +1,7 @@
-#include "Sequence.h"
+#include "Instance.h"
 using namespace std;
 
-Sequence::Sequence(istream& is, int quot): alignments_loaded(0), HePl(0) {
+Instance::Instance(istream& is, int quot): alignments_loaded(0), HePl(0) {
   char temp[MAX_T];
 
   if (quot == 0) is >> name;
@@ -31,7 +31,7 @@ Sequence::Sequence(istream& is, int quot): alignments_loaded(0), HePl(0) {
     }
 }
 
-Sequence::~Sequence() {
+Instance::~Instance() {
   unload_alignments();
   
   if(HePl)
@@ -43,7 +43,7 @@ Sequence::~Sequence() {
   delete[] u;
 }
 
-int Sequence::load_alignments(char* alidir, int dir) {
+int Instance::load_alignments(char* alidir, int dir) {
   filebuf inbuf;
   char temp[MAX_T];
   char fname[1024];
@@ -93,7 +93,7 @@ int Sequence::load_alignments(char* alidir, int dir) {
 
 }
 
-int Sequence::unload_alignments() {
+int Instance::unload_alignments() {
   if(alignments_loaded) {
     for(int quanti=0; quanti<alignments_loaded; ++quanti)
       delete[] ALIGNMENTS[quanti];
@@ -105,7 +105,7 @@ int Sequence::unload_alignments() {
     return 0;
 }
 
-Float Sequence::profile_entropy() {
+Float Instance::profile_entropy() {
   Float sum=0;
   for(int t=1; t<=length; ++t) {
     for (int aa=0; aa<27; ++aa) {
@@ -120,7 +120,7 @@ Float Sequence::profile_entropy() {
   return sum;
 }
 
-int Sequence::generate_profile(char* alidir, int dir) {
+int Instance::generate_profile(char* alidir, int dir) {
   if (HePl) return 1;
 
   Float* Pres = new Float[length+1];
@@ -243,12 +243,12 @@ int Sequence::generate_profile(char* alidir, int dir) {
 
 }
 
-inline void Sequence::unload_profile() {
+inline void Instance::unload_profile() {
   HePl = 0;
   delete[] HeP;
 }
 
-void Sequence::write(ostream& os) {
+void Instance::write(ostream& os) {
   os << name << endl;
 
   for(int i=1; i<=length; ++i)
@@ -264,7 +264,7 @@ void Sequence::write(ostream& os) {
   os << endl << endl;
 }
 
-void Sequence::write_predictions(ostream& os) {
+void Instance::write_predictions(ostream& os) {
   for(int i=1; i<=length; ++i)
     os << (char)('A'+u[i]);
   os << endl;

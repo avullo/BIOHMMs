@@ -2,7 +2,7 @@
 #include "DataSet.h"
 using namespace std;
 
-DataSet::DataSet(int the_length): totSize(0), length(the_length), seq(new Sequence*[length]) {}
+DataSet::DataSet(int the_length): totSize(0), length(the_length), seq(new Instance*[length]) {}
 
 DataSet::DataSet(istream& is, int quot): totSize(0), length(0) {
   // TODO: check length is > 0
@@ -10,9 +10,9 @@ DataSet::DataSet(istream& is, int quot): totSize(0), length(0) {
   
   int foo;
   is >> foo >> foo;
-  seq = new Sequence*[length];
+  seq = new Instance*[length];
   for (int p=0; p<length; ++p) {
-    seq[p] = new Sequence(is, quot);
+    seq[p] = new Instance(is, quot);
     totSize += seq[p]->length;
   }
   // TODO: check totSize > 0

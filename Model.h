@@ -3,7 +3,7 @@
 
 #include <cstdlib>
 #include <cmath>
-#include "Sequence.h"
+#include "Instance.h"
 #include "CPTParameterisation.h"
 
 class Model {
@@ -40,10 +40,10 @@ class Model {
   void write(std::ostream& os);
   
   void randomize(int seed);
-  void extimation(Sequence* seq);
+  void extimation(Instance* seq);
   void maximization(Float att = 0.1, Float prior = .05);
 
-  void predict(Sequence* seq);
+  void predict(Instance* seq);
   Float* out() { return model->out(); } 
   int** getConf() { return  Conf; }
   int getNErrors() { return nerrors; }

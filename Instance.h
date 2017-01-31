@@ -1,5 +1,5 @@
-#ifndef SEQUENCE_H
-#define SEQUENCE_H
+#ifndef SAMPLE_H
+#define SAMPLE_H
 
 #include <iostream>
 #include <cmath>
@@ -38,7 +38,7 @@ static int translateY[26] = {
 
 static char Ytranslate[26] = "HEC";
 
-class Sequence {
+class Instance {
  public:
 
   char name[256];
@@ -56,8 +56,8 @@ class Sequence {
   Float* HeP;
   int HePl;
 
-  Sequence(std::istream& is, int quot = 0);
-  ~Sequence();
+  Instance(std::istream& is, int quot = 0);
+  ~Instance();
   
   int load_alignments(char* alidir, int dir = 0);
   int unload_alignments();
@@ -68,4 +68,4 @@ class Sequence {
   void write_predictions(std::ostream& os);
 };
 
-#endif // SEQUENCE_H
+#endif // SAMPLE_H

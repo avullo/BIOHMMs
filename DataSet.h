@@ -1,13 +1,13 @@
 #ifndef DATASET_H
 #define DATASET_H
 
-#include "Sequence.h"
+#include "Instance.h"
 #include <iostream>
 
 class DataSet {
  public:
   int length;
-  Sequence** seq;
+  Instance** seq;
   int totSize;
 
   DataSet() {};
