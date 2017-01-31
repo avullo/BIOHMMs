@@ -1,5 +1,4 @@
 #include "Model.h"
-#include "Sequence.h"
 #include "DataSet.h"
 
 #include <cmath>
