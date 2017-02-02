@@ -1,5 +1,5 @@
-#ifndef SAMPLE_H
-#define SAMPLE_H
+#ifndef INSTANCE_H
+#define INSTANCE_H
 
 #include <iostream>
 #include <cmath>
@@ -68,4 +68,4 @@ class Instance {
   void write_predictions(std::ostream& os);
 };
 
-#endif // SAMPLE_H
+#endif // INSTANCE_H
