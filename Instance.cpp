@@ -1,7 +1,7 @@
 #include "Instance.h"
 using namespace std;
 
-Instance::Instance(istream& is, int quot): alignments_loaded(0), HePl(0) {
+Instance::Instance(istream& is, Alphabet* isymbols, Alphabet* osymbols, int quot): alignments_loaded(0), HePl(0) {
   char temp[MAX_T];
 
   if (quot == 0) is >> name;
@@ -18,16 +18,18 @@ Instance::Instance(istream& is, int quot): alignments_loaded(0), HePl(0) {
   memset(app, 0, 3*(length+1)*sizeof(Float));
 
   for(int i=1; i<=length; ++i) {
-    u[i] = temp[i-1] - 'A';
-    if (u[i]<0 || u[i]>26) u[i]=-1;
+    // u[i] = temp[i-1] - 'A';
+    // if (u[i]<0 || u[i]>26) u[i]=-1;
+    u[i] = isymbols->encode(temp[i-1]);
   }
 
   char c;
   if(quot == 0)
     for (int i=1; i<=length; ++i) {
       is >> c;
-      y[i] = translateY[c-'A'];
-      if (y[i]<0 || y[i]>26) y[i]=-1;
+      // y[i] = translateY[c-'A'];
+      // if (y[i]<0 || y[i]>26) y[i]=-1;
+      y[i] = osymbols->encode(c);
     }
 }
 
