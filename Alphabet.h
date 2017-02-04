@@ -6,17 +6,27 @@
 #include <cstddef>
 #include <string>
 
+// typedef char Symbol;
+
 class Alphabet {
  public:
-  virtual int encode(char) = 0;
-  virtual ~Alphabet() {}
   
   class BadAlphabetCreation: public std::logic_error {
   public:
   BadAlphabetCreation(std::string type):
     logic_error("Cannot create type " + type) {}
   };
-  
+
+  /* class BadSymbol: public std::logic_error { */
+  /* public: */
+  /* BadSymbol(char symbol): */
+  /*   logic_error("Cannot encode symbol " + symbol) {} */
+  /* }; */
+
+  virtual int encode(char) = 0;
+  virtual char decode(int) = 0;
+  virtual ~Alphabet() {}
+
   // factory method
   static Alphabet* factory(const std::string&)
     throw(BadAlphabetCreation);
@@ -26,9 +36,11 @@ class Alphabet {
 class AminoAcidSymbols: public Alphabet {
   AminoAcidSymbols() {}
   friend class Alphabet;
+  static std::string alphabet;
   
  public:
   int encode(char);
+  char decode(int);
   ~AminoAcidSymbols() {}
 
 };
@@ -36,9 +48,11 @@ class AminoAcidSymbols: public Alphabet {
 class SecondaryStructureSymbols: public Alphabet {
   SecondaryStructureSymbols() {}
   friend class Alphabet;
+  static std::string alphabet;
   
  public:
-  int encode(char);  
+  int encode(char);
+  char decode(int);
   ~SecondaryStructureSymbols() {}
 
 };
