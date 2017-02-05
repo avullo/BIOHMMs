@@ -1,12 +1,15 @@
 #ifndef DATASET_H
 #define DATASET_H
 
+#include "Alphabet.h"
 #include "Instance.h"
 #include <iostream>
 
 class DataSet {
  public:
   int length;
+  Alphabet* inputSymbols;
+  Alphabet* outputSymbols;
   Instance** seq;
   int totSize;
 

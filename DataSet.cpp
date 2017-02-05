@@ -1,21 +1,34 @@
 #include "General.h"
 #include "DataSet.h"
+#include <cassert>
+#include <cstdlib>
+#include <string>
 using namespace std;
 
 DataSet::DataSet(int the_length): totSize(0), length(the_length), seq(new Instance*[length]) {}
 
 DataSet::DataSet(istream& is, int quot): totSize(0), length(0) {
-  // TODO: check length is > 0
   is >> length;
+  assert(length > 0);
   
-  int foo;
-  is >> foo >> foo;
+  string inputAlphabet, outputAlphabet; 
+  is >> inputAlphabet >> outputAlphabet;
+
+  try {
+    inputSymbols = Alphabet::factory(inputAlphabet);
+    outputSymbols = Alphabet::factory(outputAlphabet);
+  } catch(Alphabet::BadAlphabetCreation e) {
+    cerr << e.what() << endl;
+    exit(EXIT_FAILURE);
+  }
+  
   seq = new Instance*[length];
   for (int p=0; p<length; ++p) {
-    seq[p] = new Instance(is, quot);
+    seq[p] = new Instance(is, inputSymbols, outputSymbols, quot);
     totSize += seq[p]->length;
   }
-  // TODO: check totSize > 0
+  
+  assert(totSize > 0);
 };
 
 DataSet::~DataSet() {
@@ -24,6 +37,9 @@ DataSet::~DataSet() {
       delete seq[p];
   if(seq != NULL)
     delete[] seq;
+
+  delete inputSymbols;
+  delete outputSymbols;
 }
 
 void DataSet::write(ostream& os) {

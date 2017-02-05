@@ -1,9 +1,10 @@
-#ifndef SAMPLE_H
-#define SAMPLE_H
+#ifndef INSTANCE_H
+#define INSTANCE_H
 
+#include "General.h"
+#include "Alphabet.h"
 #include <iostream>
 #include <cmath>
-#include "General.h"
 
 #define MAX_T 8196
 
@@ -56,7 +57,7 @@ class Instance {
   Float* HeP;
   int HePl;
 
-  Instance(std::istream& is, int quot = 0);
+  Instance(std::istream& is, Alphabet* inputSymbols, Alphabet* outputSymbols, int quot = 0);
   ~Instance();
   
   int load_alignments(char* alidir, int dir = 0);
@@ -64,8 +65,10 @@ class Instance {
   Float profile_entropy();
   int generate_profile(char* alidir, int dir = 0);
   void unload_profile();
+
+  // TODO: use Alphabet decode
   void write(std::ostream& os);
   void write_predictions(std::ostream& os);
 };
 
-#endif // SAMPLE_H
+#endif // INSTANCE_H
