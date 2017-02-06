@@ -9,7 +9,6 @@
 class Model {
   int NU;
   int NY;
-
   int NF;
   int NB;
 
@@ -33,7 +32,7 @@ class Model {
 
  public:
 
-  Model(int NF, int NB);
+  Model(int NU, int NY, int NF, int NB);
   Model(std::istream& is);
   ~Model();
   void read(std::istream& is);

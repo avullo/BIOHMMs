@@ -12,14 +12,7 @@ void Model::alloc() {
   // TODO: initialise Conf?
 }
 
-Model::Model(int the_NF, int the_NB): NF(the_NF), NB(the_NB) {
-  // these are hardwired for a secondary structure prediction problem
-  // where the input is the AA or AA profile at each position and the
-  // output is one-hot encoding of three classes
-  // TODO: make it general
-  NU = 27;
-  NY = 3;
-  
+Model::Model(int the_NU, int the_NY, int the_NF, int the_NB): NU(the_NU), NY(the_NY), NF(the_NF), NB(the_NB) {
   model = new CPTParameterisation(NU, NY, NF, NB);
 
   alloc();
