@@ -1,6 +1,7 @@
 #include "Model.h"
 #include "DataSet.h"
 
+#include <cassert>
 #include <cmath>
 #include <iostream>
 using namespace std;
@@ -246,6 +247,24 @@ main(int argc, char** argv)
   Options Opt(optstream);
   Opt.write();
 
+  // TODO
+  // training/test sets file names should be given as arguments,
+  // consider default as well
+  cout << "Reading train dataset" << endl << flush;
+  ifstream dstream("train.dataset");
+  DataSet trainingSet(dstream);
+  // trainingSet.set_belief(Opt.belief);
+  
+  cout << "Reading test dataset " << endl << flush;
+  ifstream tstream("test.dataset");
+  DataSet testSet(tstream);
+  // testSet.set_belief(Opt.belief);
+
+  int inputDim = trainingSet.getInputDim();
+  int outputDim = trainingSet.getOutputDim();
+  assert(inputDim == testSet.getInputDim());
+  assert(outputDim == testSet.getOutputDim());
+  
   Model* M;
   if (Opt.readModel) {
     char tmp[1024];
@@ -254,26 +273,17 @@ main(int argc, char** argv)
     ifstream mstream(tmp);
     M = new Model(mstream);
   } else {
-    cout << "Creating model\n"<<flush;
+    cout << "Creating model" << endl << flush;
 
-    M = new Model(Opt.NF, Opt.NB);
+    M = new Model(inputDim, outputDim, Opt.NF, Opt.NB);
 
-    cout << "Generating random parameters\n"<<flush;
+    cout << "Generating random parameters" << endl << flush;
     M->randomize(Opt.seed);
     save(-1, M);
     Opt.readEpoch = 0;
   }
-
-  cout << "Reading train dataset\n"<<flush;
-  ifstream dstream("train.dataset");
-  DataSet D(dstream);
-  //  D.set_belief(Opt.belief);
-  cout << "Reading test dataset\n"<<flush;
-  ifstream tstream("test.dataset");
-  DataSet T(tstream);
-  //  T.set_belief(Opt.belief);
   
-  train(M, D, T, Opt);
+  train(M, trainingSet, testSet, Opt);
 
   delete M;
   
