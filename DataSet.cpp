@@ -42,6 +42,10 @@ DataSet::~DataSet() {
   delete outputSymbols;
 }
 
+int DataSet::getInputDim() { return inputSymbols->size(); }
+
+int DataSet::getOutputDim() { return outputSymbols->size(); }
+
 void DataSet::write(ostream& os) {
   os << length << endl;
   for(int p=0; p<length; ++p) {

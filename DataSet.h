@@ -18,6 +18,8 @@ class DataSet {
   DataSet(std::istream& is, int quot = 0);
   ~DataSet();
 
+  int getInputDim();
+  int getOutputDim();
   void write(std::ostream& os);
   void write(char* fname);
   void write_predictions(std::ostream& os);

@@ -15,22 +15,21 @@ class Alphabet {
   public:
   BadAlphabetCreation(std::string type):
     logic_error("Cannot create type " + type) {}
-  };
+ };
 
   /* class BadSymbol: public std::logic_error { */
   /* public: */
   /* BadSymbol(char symbol): */
   /*   logic_error("Cannot encode symbol " + symbol) {} */
   /* }; */
-
-  virtual int encode(char) = 0;
-  virtual char decode(int) = 0;
-  virtual ~Alphabet() {}
-
-  // factory method
-  static Alphabet* factory(const std::string&)
-    throw(BadAlphabetCreation);
-  
+ virtual int size() = 0;
+ virtual int encode(char) = 0;
+ virtual char decode(int) = 0;
+ virtual ~Alphabet() {}
+ 
+ // factory method
+ static Alphabet* factory(const std::string&)
+   throw(BadAlphabetCreation);
 };
 
 class AminoAcidSymbols: public Alphabet {
@@ -39,10 +38,11 @@ class AminoAcidSymbols: public Alphabet {
   static std::string alphabet;
   
  public:
+  int size() { return alphabet.size(); }
   int encode(char);
   char decode(int);
   ~AminoAcidSymbols() {}
-
+  
 };
 
 class SecondaryStructureSymbols: public Alphabet {
@@ -51,6 +51,7 @@ class SecondaryStructureSymbols: public Alphabet {
   static std::string alphabet;
   
  public:
+  int size() { return alphabet.size(); }
   int encode(char);
   char decode(int);
   ~SecondaryStructureSymbols() {}
