@@ -1,7 +1,9 @@
 #include "Instance.h"
 using namespace std;
 
-Instance::Instance(istream& is, Alphabet* isymbols, Alphabet* osymbols, int quot): alignments_loaded(0), HePl(0) {
+Instance::Instance(istream& is, Alphabet* isymbols, Alphabet* osymbols, int quot):
+  inputSymbols(isymbols), outputSymbols(osymbols), alignments_loaded(0), HePl(0) {
+  // NOTE: does not own input/output alphabet pointers (DataSet does that)
   char temp[MAX_T];
 
   if (quot == 0) is >> name;
@@ -17,19 +19,14 @@ Instance::Instance(istream& is, Alphabet* isymbols, Alphabet* osymbols, int quot
   app = new Float[3*(length+1)];
   memset(app, 0, 3*(length+1)*sizeof(Float));
 
-  for(int i=1; i<=length; ++i) {
-    // u[i] = temp[i-1] - 'A';
-    // if (u[i]<0 || u[i]>26) u[i]=-1;
-    u[i] = isymbols->encode(temp[i-1]);
-  }
+  for(int i=1; i<=length; ++i)
+    u[i] = inputSymbols->encode(temp[i-1]);
 
   char c;
   if(quot == 0)
     for (int i=1; i<=length; ++i) {
       is >> c;
-      // y[i] = translateY[c-'A'];
-      // if (y[i]<0 || y[i]>26) y[i]=-1;
-      y[i] = osymbols->encode(c);
+      y[i] = outputSymbols->encode(c);
     }
 }
 
@@ -254,25 +251,25 @@ void Instance::write(ostream& os) {
   os << name << endl;
 
   for(int i=1; i<=length; ++i)
-    os << (char)('A'+u[i]);
+    os << inputSymbols->decode(u[i]);
   os << endl;
 
   for(int i=1; i<=length; ++i)
-    os << (char)(Ytranslate[y[i]]);
+    os << outputSymbols->decode(y[i]);
   os << endl;
 
   for(int i=1; i<=length; ++i)
-    os << (char)(Ytranslate[y_pred[i]]);
+    os << outputSymbols->decode(y_pred[i]);
   os << endl << endl;
 }
 
 void Instance::write_predictions(ostream& os) {
   for(int i=1; i<=length; ++i)
-    os << (char)('A'+u[i]);
+    os << inputSymbols->decode(u[i]);
   os << endl;
 
   for(int i=1; i<=length; ++i)
-    os << (char)(Ytranslate[y_pred[i]]);
+    os << outputSymbols->decode(y_pred[i]);
   os << endl;
 
   // the following can be compressed in a cycle of three steps
