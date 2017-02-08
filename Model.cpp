@@ -53,8 +53,9 @@ void Model::predict(Instance* instance) {
     int arg = -1;
 
     for(int c=0; c<NY; ++c) {
-      if (model->out()[NY*t+c] > pred) {
-	pred = model->out()[NY*t+c];
+      Float out_c = model->out(t, c);
+      if (out_c > pred) {
+	pred = out_c;
 	arg = c;
       }
     }
