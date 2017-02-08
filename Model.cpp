@@ -1,21 +1,8 @@
 #include "Model.h"
 using namespace std;
 
-void Model::alloc() {
-  // TODO initialise?!
-  counted = new int[NY];
-  nerrors_ = new int[NY];
-	
-  Conf = new int*[NY];
-  for(int y=0; y<NY; ++y)
-    Conf[y] = new int[NY];
-  // TODO: initialise Conf?
-}
-
 Model::Model(int the_NU, int the_NY, int the_NF, int the_NB): NU(the_NU), NY(the_NY), NF(the_NF), NB(the_NB) {
   model = new CPTParameterisation(NU, NY, NF, NB);
-
-  alloc();
 }
 
 Model::Model(istream& is) {
@@ -23,15 +10,9 @@ Model::Model(istream& is) {
   is >> NF >> NB;
 
   model = new CPTParameterisation(is);
-
-  alloc();
 }
 
 Model::~Model() {
-  for(int y=0; y<NY; ++y)
-    delete[] Conf[y];
-  delete[] Conf;
-
   delete model;
 }
 
@@ -88,7 +69,7 @@ void Model::predict(Instance* seq) {
   // NOTE
   // Here it makes a copy of the input/output sequence
   // which seems a waste of time/space
-  // It doesn't also seem to be using the output sequence
+  // It doesn't also seem to be using the output sequence O
   I = new int[seq->length+1];
   O = new int[seq->length+1];
 
@@ -111,34 +92,7 @@ void Model::predict(Instance* seq) {
     }
     seq->y_pred[t] = arg;
   }
-
-  for(int t=1; t<=seq->length; ++t) {
-    // cout << t << ":\t" << seq->y[t] << ',' << seq->y_pred[t] << endl;
-    if (seq->y[t] != -1 && seq->y_pred[t] != -1) {
-      Conf[seq->y_pred[t]][seq->y[t]]++;
-      counted[seq->y[t]]++;
-    } else { 
-      cout << seq->y_pred[t] << " " << seq->y[t] << endl << flush;
-    }
-
-    if (seq->y[t] != seq->y_pred[t]) {
-      ++nerrors;
-      nerrors_[seq->y[t]]++;
-    }
-  }
   
   delete[] I;
   delete[] O;
-}
-
-void Model::resetNErrors() { 
-  nerrors = 0;
-  memset(nerrors_, 0, NY*sizeof(int));
-  memset(counted, 0, NY*sizeof(int));
-  
-  for(int p=0; p<NY; ++p)
-    for(int y=0; y<NY; ++y)
-      Conf[p][y] = 0;
-
-  model->resetError();
 }

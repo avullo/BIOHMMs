@@ -12,24 +12,13 @@ class Model {
   int NF;
   int NB;
 
+  // the underlying model implementation,
+  // set fixed to CPTs at the moment
+  CPTParameterisation* model; 
+
   Float threshold;
-
-  CPTParameterisation* model;
-
-  int** Conf;
-
-  Float temp_error;
-  int temp_aas;
-  
-  int* counted;
-  double squared_error;
-  int nerrors;
-  int* nerrors_;
-
   Float epsilon;
-
-  void alloc();
-
+  
  public:
 
   Model(int NU, int NY, int NF, int NB);
@@ -44,13 +33,7 @@ class Model {
 
   void predict(Instance* seq);
   Float* out() { return model->out(); } 
-  int** getConf() { return  Conf; }
-  int getNErrors() { return nerrors; }
-  int getNErrors_(int i) { return nerrors_[i]; }
   int getClasses() { return NY; }
-  int* getCounted() { return counted; }
-  void resetNErrors();
-  Float get_tot_error() { return temp_error; }
   Float get_squared_error() { return model->getError(); }
   void reset_squared_error() { model->resetError(); }
   
