@@ -60,6 +60,89 @@ public:
   }
 };
 
+class ClassificationPerformance {
+  int NY;
+  int** _cf; // confusion matrix
+
+  string msg;
+public:
+  ClassificationPerformance(int nclasses, const string& message = ""): NY(nclasses), msg(message) {
+    _cf = new int*[NY];
+    for(int y=0; y<NY; ++y)
+      _cf[y] = new int[NY];
+  }
+  ~ClassificationPerformance() {
+    for(int y=0; y<NY; ++y)
+      delete[] _cf[y];
+    delete[] _cf;
+  }
+
+  void update(Instance* instance) {
+    for(int t=1; t<=instance->length; ++t) {
+      assert(instance->y[t] != -1 && instance->y_pred[t] != -1);
+      _cf[instance->y_pred[t]][instance->y[t]]++;
+    }
+  }
+  
+  void reset() {
+    for(int y1=0; y1<NY; ++y1)
+      for(int y2=0; y2<NY; ++y2)
+	_cf[y1][y2] = 0;
+  }
+
+  int getNumInstancesOfClass(int c) const {
+    assert(c >= 0 && c < NY);
+
+    int count = 0;
+    for(int y=0; y<NY; ++y)
+      count += _cf[y][c];
+
+    return count;
+  }
+
+  int getNumErrorsForClass(int c) const {
+    assert(c >= 0 && c < NY);
+    
+    int count = 0;
+    for(int y=0; y<NY; ++y)
+      if(y != c)
+	count += _cf[y][c];
+
+    return count;
+  }
+  
+  int getTotalNumErrors() const {
+    int count = 0;
+    for(int y1=0; y1<NY; ++y1)
+      for(int y2=0; y2!=NY; ++y2) 
+	if(y1 != y2)
+	  count += _cf[y1][y2];
+
+    return count;
+    
+  }
+
+  friend ostream& operator<<(ostream& os, const ClassificationPerformance& p) {
+    double a[128];
+    double all = 0;
+    for(int y=0; y<p.NY; ++y) {
+      a[y] = p.getNumInstancesOfClass(y);
+      all += a[y];
+    }
+
+    int tot_class_errors = p.getTotalNumErrors();
+    os << endl << endl << p.msg << "_NErrors= " << tot_class_errors << "/" << all;
+    os << " " << (double)tot_class_errors/(double)(all) * 100.0;
+
+    for(int y=0; y<p.NY; ++y) {
+      int tot_errors_per_class = p.getNumErrorsForClass(y);
+      os << endl << "Class" << y <<"= " << tot_errors_per_class << "/" << a[y];
+      os << "\t" << (double)tot_errors_per_class/(double)a[y] * 100.0;
+    }
+  }
+  
+};
+
 int Errcomp=100000;
 
 void save(int epoch, Model* M) {
@@ -109,31 +192,22 @@ void shuffle(DataSet& D, int* pos) {
 
 void evaluate(Model* M, DataSet& D, char* which) {
   cout << endl << " counting_" << which << "_errors" << flush;
-  
-  M->resetNErrors();
+
+  ClassificationPerformance perf(M->getClasses(), which);
+  perf.reset();
   for(int p=0; p<D.length; ++p) {
     M->predict(D.seq[p]);
+    perf.update(D.seq[p]);
+    
     if(p%20==0) cout << "." << flush;
   }
 
-  double a[128];
-  double all = 0;
-  for(int y=0; y<M->getClasses(); ++y) {
-    a[y] = M->getCounted()[y];
-    all += a[y];
-  }
+  cout << perf;
 
-  cout << endl << endl << which << "_NErrors= " << M->getNErrors() << "/" << all;
-  cout << " " << (double)M->getNErrors()/(double)(all) * 100.0;
-
-  for(int y=0; y<M->getClasses(); ++y) {
-    cout << endl << "Class" << y <<"= " << M->getNErrors_(y) << "/" << a[y];
-    cout << "\t" << (double)M->getNErrors_(y)/(double)a[y] * 100.0;
-  }
-
-  if((strncmp(which, "test", 4)==0) && (M->getNErrors()<Errcomp)) {
+  int tot_errors = perf.getTotalNumErrors();
+  if((strncmp(which, "test", 4)==0) && tot_errors < Errcomp) {
     save(-10,M);
-    Errcomp = M->getNErrors();
+    Errcomp = tot_errors;
   }
 
   cout << endl;
