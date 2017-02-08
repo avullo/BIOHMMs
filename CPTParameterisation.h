@@ -1,6 +1,6 @@
 /*
 
-  Represents the parameters of the model explicitly,
+  Represents the parameters of a BIOHMM explicitly,
   using conditional propabability tables (CPTs)
 
  */
@@ -28,6 +28,7 @@ class CPTParameterisation {
   void predict(int*, int);
 
   Float* out() { return Y; }
+  Float  out(int t, int c) { return Y[NO*t + c]; }
   Float getError() { return error; }
   void resetError() { error =.0; }
 

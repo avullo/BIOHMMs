@@ -1007,21 +1007,19 @@ void CPTParameterisation::saveOutput(int length) {
     for (i=0;i<NI;i++) {
       for (b=0;b<NB;b++) {
 	for (f=0;f<NF;f++) {
-	  for (o=0;o<NO;o++) {
+	  for (o=0;o<NO;o++)
 	    Y[NO*t+o] += OFBI[t][i][b][f][o];
-	    //				cout << t << " " << i << " " << b << " " << f << " " << o << " " << OFBI[t][i][b][f][o] << "\n"<<flush;
-	  }
 	}
       }
     }
+
     tot=0;
     for (o=0;o<NO;o++) {
       tot += Y[NO*t+o];
       if (Y[NO*t+o]>0) error -= log(Y[NO*t+o]);
     }
-    for (o=0;o<NO;o++) {
-      Y[NO*t+o]/=tot;
-    }
+    for (o=0;o<NO;o++)
+      Y[NO*t+o] /= tot;
   }
 }
 
