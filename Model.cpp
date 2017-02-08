@@ -37,50 +37,18 @@ void Model::randomize(int seed) {
   //NetF->initWeights(seed);
 }
 
-void Model::extimation(Instance *seq) {
-  int* I;
-  int* O;
-
-  // NOTE
-  // Here it makes a copy of the input/output sequence
-  // which seems a waste of time/space
-  I = new int[seq->length+1];
-  O = new int[seq->length+1];
-
-  for(int t=1; t<=seq->length; ++t) {
-    I[t] = seq->u[t];
-    O[t] = seq->y[t];
-  }
-
-  model->extimation(I, O, seq->length);
-
-  delete[] I;
-  delete[] O;
+void Model::extimation(Instance* instance) {
+  model->extimation(instance->u, instance->y, instance->length);
 }
 
 void Model::maximization(Float att, Float prior) {
   model->maximization(att, prior);
 }
 
-void Model::predict(Instance* seq) {
-  int* I;
-  int* O;
+void Model::predict(Instance* instance) {
+  model->predict(instance->u, instance->length);
 
-  // NOTE
-  // Here it makes a copy of the input/output sequence
-  // which seems a waste of time/space
-  // It doesn't also seem to be using the output sequence O
-  I = new int[seq->length+1];
-  O = new int[seq->length+1];
-
-  for(int t=1; t<=seq->length; ++t) {
-    I[t] = seq->u[t];
-    O[t] = seq->y[t];
-  }
-
-  model->predict(I, seq->length);
-
-  for(int t=1; t<=seq->length; ++t) {
+  for(int t=1; t<=instance->length; ++t) {
     Float pred = .0;
     int arg = -1;
 
@@ -90,9 +58,6 @@ void Model::predict(Instance* seq) {
 	arg = c;
       }
     }
-    seq->y_pred[t] = arg;
+    instance->y_pred[t] = arg;
   }
-  
-  delete[] I;
-  delete[] O;
 }
