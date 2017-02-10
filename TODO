@@ -1,0 +1,3 @@
+Implements NN parameterisation and make model able to select one of the available implementation
+
+Reorganise code to make it ready for being provided as a library
