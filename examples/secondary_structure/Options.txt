@@ -1,6 +1,6 @@
 epsilon 0.1
-NF      3
-NB      3
+NF      2
+NB      2
 seed    949
 shuffle 0
 batch_blocks 10
@@ -10,4 +10,4 @@ nEpochs      10
 adaptive     1000
 reload       1
 belief       0
-attenuation	0.9
+attenuation	0.5
