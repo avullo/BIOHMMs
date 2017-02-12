@@ -258,13 +258,13 @@ void train(Model* M, DataSet& D, DataSet& T, Options& Opt) {
 	continue;
       }
 
-      M->extimation(D.seq[p]);
+      M->e_step(D.seq[p]);
       sofar += (D.seq[p])->length;
 
       batch_cnt++;
       if (batch_cnt >= D.length/Opt.batch_blocks && 
 	  D.length-pp >= D.length/Opt.batch_blocks) {
-	M->maximization(Opt.attenuation, Opt.belief);
+	M->m_step(Opt.attenuation, Opt.belief);
 	//		  	cout << "ha"<<flush;
 
 	//	cout << -M->get_squared_error() << "\n";
@@ -281,7 +281,7 @@ void train(Model* M, DataSet& D, DataSet& T, Options& Opt) {
       }
     }
     if (batch_cnt>0)
-      M->maximization(Opt.attenuation, Opt.belief);
+      M->m_step(Opt.attenuation, Opt.belief);
 
     Float current_squared_error = M->get_squared_error();
     cout << "\nEpoch " << epoch << " Error= " << current_squared_error;
