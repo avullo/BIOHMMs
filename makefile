@@ -1,5 +1,5 @@
-OBJECTST = General.o Alphabet.o Instance.o DataSet.o Model.o CPTParameterisation.o Train.o
-HEADERST = General.h Alphabet.o Instance.h DataSet.h Model.h CPTParameterisation.h
+OBJECTST = General.o Alphabet.o Instance.o DataSet.o Model.o Parameterisation.o MTParameterisation.o Train.o
+HEADERST = General.h Alphabet.o Instance.h DataSet.h Model.h Parameterisation.h
 
 CC	= g++
 CFLAGS  = -g
@@ -23,10 +23,13 @@ Instance.o : Instance.cpp Instance.h General.o
 DataSet.o : DataSet.cpp DataSet.h General.o Alphabet.o Instance.o
 	$(CC) -c $(CFLAGS) $*.cpp
 
-CPTParameterisation.o : CPTParameterisation.cpp CPTParameterisation.h General.o
+Parameterisation.o : Parameterisation.cpp Parameterisation.h General.o
 	$(CC) -c $(CFLAGS) $*.cpp
 
-Model.o : Model.cpp Model.h Instance.o CPTParameterisation.o
+MTParameterisation.o : MTParameterisation.cpp Parameterisation.h General.o
+	$(CC) -c $(CFLAGS) $*.cpp
+
+Model.o : Model.cpp Model.h Instance.o MTParameterisation.o
 	$(CC) -c $(CFLAGS) $*.cpp
 
 clean:
