@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <cfloat>
 #include <iostream>
 using namespace std;
 
@@ -60,18 +61,18 @@ public:
   }
 };
 
-class ClassificationPerformance {
+class Performance {
   int NY;
   int** _cf; // confusion matrix
 
   string msg;
 public:
-  ClassificationPerformance(int nclasses, const string& message = ""): NY(nclasses), msg(message) {
+  Performance(int nclasses, const string& message = ""): NY(nclasses), msg(message) {
     _cf = new int*[NY];
     for(int y=0; y<NY; ++y)
       _cf[y] = new int[NY];
   }
-  ~ClassificationPerformance() {
+  ~Performance() {
     for(int y=0; y<NY; ++y)
       delete[] _cf[y];
     delete[] _cf;
@@ -122,7 +123,7 @@ public:
     
   }
 
-  friend ostream& operator<<(ostream& os, const ClassificationPerformance& p) {
+  friend ostream& operator<<(ostream& os, const Performance& p) {
     double a[128];
     double all = 0;
     for(int y=0; y<p.NY; ++y) {
@@ -193,7 +194,7 @@ void shuffle(DataSet& D, int* pos) {
 void evaluate(Model* M, DataSet& D, char* which) {
   cout << endl << " counting_" << which << "_errors" << flush;
 
-  ClassificationPerformance perf(M->getClasses(), which);
+  Performance perf(M->getClasses(), which);
   perf.reset();
   for(int p=0; p<D.length; ++p) {
     M->predict(D.seq[p]);
@@ -230,71 +231,48 @@ void train(Model* M, DataSet& D, DataSet& T, Options& Opt) {
   */
 
   cout << "Start learning" << endl;
-  
-  int* wait = new int[D.length];
-  for(int p=0; p<D.length; ++p)
-    wait[p]=0;
-  
-  //  srand48(9199298);
   srand(Opt.seed);
 
   int* pos = new int[D.length];
   for (int pp=0; pp<D.length; ++pp)
     pos[pp] = pp;
-  Float previous_squared_error = 1e35; // FLT_MAX?!
+  Float previous_error = FLT_MAX;
   
-  for (int epoch=Opt.readEpoch+1; epoch<=Opt.readEpoch + Opt.nEpochs; ++epoch) {
-    if (Opt.shuffle)
+  for(int epoch=Opt.readEpoch+1; epoch<=Opt.readEpoch + Opt.nEpochs; ++epoch) {
+    if(Opt.shuffle)
       shuffle(D, pos);
 
-    M->reset_squared_error();
-    Float sofar=0;
-    int batch_cnt=0;
-    for (int pp=0; pp<D.length; pp++) {
-      int p= pos[pp]; // drand48()*D.length;
-      wait[p]++;
-      if (wait[p]<=0) {
-	cout << p << ",";
-	continue;
-      }
+    M->resetError();
+    int batch_cnt = 0;
+    for(int pp=0; pp<D.length; ++pp) {
+      int p= pos[pp];
 
       M->e_step(D.seq[p]);
-      sofar += (D.seq[p])->length;
 
       batch_cnt++;
-      if (batch_cnt >= D.length/Opt.batch_blocks && 
+      if(batch_cnt >= D.length/Opt.batch_blocks && 
 	  D.length-pp >= D.length/Opt.batch_blocks) {
 	M->m_step(Opt.attenuation, Opt.belief);
-	//		  	cout << "ha"<<flush;
-
-	//	cout << -M->get_squared_error() << "\n";
-	//	cout << "(" << pp << ")" << flush;
-	batch_cnt=0;
+	batch_cnt = 0;
       }
-      if (pp%20==0) {
-	//		  	for (int cy=0;cy<Opt.cycles;cy++) {
-	//				cout << sqrt(M->getdcycles()[cy]/sofar) << " ";
-	//			}
-	//			cout << "\n" << flush;
-	//			cout << M->get_squared_error() << "." << flush;
-	cout << "." << flush;
-      }
+      if(pp%20 == 0) cout << "." << flush;
     }
-    if (batch_cnt>0)
+    
+    if(batch_cnt > 0)
       M->m_step(Opt.attenuation, Opt.belief);
 
-    Float current_squared_error = M->get_squared_error();
-    cout << "\nEpoch " << epoch << " Error= " << current_squared_error;
+    Float current_error = M->getError();
+    cout << "\nEpoch " << epoch << " Error= " << current_error;
 
     save(0,M);
-    if (current_squared_error < previous_squared_error) {
+    if (current_error < previous_error) {
       gui=0;
       save(0,M);
       if (Gui>0) {
 	//      ep += ep0*0.01;
 	//      M->setEpsilon(ep);
       }
-      previous_squared_error=current_squared_error;
+      previous_error = current_error;
     }
 
     if (epoch && epoch%5==0) {
@@ -304,15 +282,11 @@ void train(Model* M, DataSet& D, DataSet& T, Options& Opt) {
       D.write("train-predictions");
       T.write("test-predictions");
     }
-    cout << "\n"<<flush;
+    cout << endl << flush;
   }
 }
 
-
-
-int
-main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
   if (argc<2) {
     cerr << "Usage: " << argv[0] << " option-file\n";
     exit(1);
