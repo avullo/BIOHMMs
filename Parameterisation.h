@@ -2,6 +2,7 @@
 #define PARAMETERISATION_H
 
 #include "General.h"
+#include <string>
 #include <iostream>
 
 /*
@@ -34,6 +35,18 @@ class Parameterisation {
   virtual Float p_OFBI(int, int, int, int) = 0;
   virtual Float p_FFI(int, int, int) = 0;
   virtual Float p_BBI(int, int, int) = 0;
+
+  class BadParameterisationCreation: public std::logic_error {
+  public:
+  BadParameterisationCreation(std::string type):
+    logic_error("Cannot create type " + type) {}
+  };
+
+  // factory methods
+  static Parameterisation* factory(int, int, int, int, const std::string&)
+    throw(BadParameterisationCreation);
+  static Parameterisation* factory(std::istream&, const std::string&)
+    throw(BadParameterisationCreation);
   
   // to allow it to access the various dimensions
   // and the distribution of the boundary variables
@@ -57,10 +70,12 @@ class Parameterisation {
 
  */
 class MTParameterisation: public Parameterisation {
- public:
   MTParameterisation();
   MTParameterisation(int, int, int, int);
   MTParameterisation(std::istream&);
+  friend class Parameterisation;
+  
+ public:
   ~MTParameterisation();
 
   void read(std::istream&);
