@@ -5,7 +5,7 @@
 #include <string>
 using namespace std;
 
-DataSet::DataSet(int the_length): totSize(0), length(the_length), seq(new Instance*[length]) {}
+DataSet::DataSet(int the_length): totSize(0), length(the_length), instances(new Instance*[length]), pos(new int[length]) {}
 
 DataSet::DataSet(istream& is, int quot): totSize(0), length(0) {
   is >> length;
@@ -22,10 +22,13 @@ DataSet::DataSet(istream& is, int quot): totSize(0), length(0) {
     exit(EXIT_FAILURE);
   }
   
-  seq = new Instance*[length];
+  instances = new Instance*[length];
+  pos = new int[length];
   for (int p=0; p<length; ++p) {
-    seq[p] = new Instance(is, inputSymbols, outputSymbols, quot);
-    totSize += seq[p]->length;
+    instances[p] = new Instance(is, inputSymbols, outputSymbols, quot);
+    pos[p] = p;
+    
+    totSize += instances[p]->length;
   }
   
   assert(totSize > 0);
@@ -33,23 +36,39 @@ DataSet::DataSet(istream& is, int quot): totSize(0), length(0) {
 
 DataSet::~DataSet() {
   for(int p=0; p<length; ++p)
-    if(seq[p] != NULL)
-      delete seq[p];
-  if(seq != NULL)
-    delete[] seq;
+    if(instances[p] != NULL)
+      delete instances[p];
+  if(instances != NULL)
+    delete[] instances;
+  if(pos != NULL)
+    delete[] pos;
 
   delete inputSymbols;
   delete outputSymbols;
 }
 
-int DataSet::getInputDim() { return inputSymbols->size(); }
+int DataSet::getInputDim() const { return inputSymbols->size(); }
 
-int DataSet::getOutputDim() { return outputSymbols->size(); }
+int DataSet::getOutputDim() const { return outputSymbols->size(); }
+
+void DataSet::shuffle() {
+  // Shuffle training set positions
+  for (int k=0; k<size(); ++k) {
+    int f1 = rand();
+    int f2 = rand();
+    int p1 = (int)((double)f1/(1.0+(double)(RAND_MAX))*size());
+    int p2 = (int)((double)f2/(1.0+(double)(RAND_MAX))*size());
+    
+    int tmp = pos[p1];
+    pos[p1] = pos[p2];
+    pos[p2] = tmp;
+  }
+}
 
 void DataSet::write(ostream& os) {
   os << length << endl;
   for(int p=0; p<length; ++p) {
-    seq[p]->write(os);
+    instances[p]->write(os);
   }
 }
 
@@ -68,7 +87,7 @@ void DataSet::write(char* fname) {
 void DataSet::write_predictions(ostream& os) {
   os << length << endl;
   for (int p=0; p<length; ++p) {
-    seq[p]->write_predictions(os);
+    instances[p]->write_predictions(os);
   }
 }
 

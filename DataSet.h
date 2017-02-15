@@ -3,23 +3,35 @@
 
 #include "Alphabet.h"
 #include "Instance.h"
+#include <cassert>
 #include <iostream>
 
 class DataSet {
- public:
   int length;
+
   Alphabet* inputSymbols;
   Alphabet* outputSymbols;
-  Instance** seq;
+
+  Instance** instances;
+  int* pos;
   int totSize;
 
+ public:
   DataSet() {};
   DataSet(int the_length);
   DataSet(std::istream& is, int quot = 0);
   ~DataSet();
 
-  int getInputDim();
-  int getOutputDim();
+  int size() const { return length; }
+  int getInputDim() const;
+  int getOutputDim() const;
+  Instance* operator[](int i) {
+    assert(i >= 0 && i < length);
+    return instances[pos[i]];
+  }
+
+  void shuffle();
+  
   void write(std::ostream& os);
   void write(char* fname);
   void write_predictions(std::ostream& os);

@@ -176,29 +176,14 @@ void load(int epoch, Model* M) {
   inbuf.close();
 }
 
-void shuffle(DataSet& D, int* pos) {
-  // Shuffle training set positions
-  for (int k=0; k<D.length; k++) {
-    //    int p1= (int)(drand48()*D.length);
-    //    int p2= (int)(drand48()*D.length);
-    int f1 = rand();
-    int f2 = rand();
-    int p1 = (int)((double)f1/(1.0+(double)(RAND_MAX))*D.length);
-    int p2 = (int)((double)f2/(1.0+(double)(RAND_MAX))*D.length);
-    int tmp = pos[p1];
-    pos[p1] = pos[p2];
-    pos[p2] = tmp;
-  }
-}
-
 void evaluate(Model* M, DataSet& D, char* which) {
   cout << endl << " counting_" << which << "_errors" << flush;
 
   Performance perf(M->getClasses(), which);
   perf.reset();
-  for(int p=0; p<D.length; ++p) {
-    M->predict(D.seq[p]);
-    perf.update(D.seq[p]);
+  for(int p=0; p<D.size(); ++p) {
+    M->predict(D[p]);
+    perf.update(D[p]);
     
     if(p%20==0) cout << "." << flush;
   }
@@ -233,25 +218,18 @@ void train(Model* M, DataSet& D, DataSet& T, Options& Opt) {
   cout << "Start learning" << endl;
   srand(Opt.seed);
 
-  int* pos = new int[D.length];
-  for (int pp=0; pp<D.length; ++pp)
-    pos[pp] = pp;
-  Float previous_error = FLT_MAX;
-  
+  Float previous_error = FLT_MAX;  
   for(int epoch=Opt.readEpoch+1; epoch<=Opt.readEpoch + Opt.nEpochs; ++epoch) {
     if(Opt.shuffle)
-      shuffle(D, pos);
+      D.shuffle();
 
     M->resetError();
     int batch_cnt = 0;
-    for(int pp=0; pp<D.length; ++pp) {
-      int p= pos[pp];
-
-      M->e_step(D.seq[p]);
+    for(int pp=0; pp<D.size(); ++pp) {
+      M->e_step(D[pp]);
 
       batch_cnt++;
-      if(batch_cnt >= D.length/Opt.batch_blocks && 
-	  D.length-pp >= D.length/Opt.batch_blocks) {
+      if(batch_cnt >= D.size()/Opt.batch_blocks && D.size()-pp >= D.size()/Opt.batch_blocks) {
 	M->m_step(Opt.attenuation, Opt.belief);
 	batch_cnt = 0;
       }
