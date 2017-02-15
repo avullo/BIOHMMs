@@ -1,4 +1,4 @@
-OBJECTST = General.o Alphabet.o Instance.o DataSet.o Model.o MTParameterisation.o Train.o
+OBJECTST = General.o Alphabet.o Instance.o DataSet.o Model.o Parameterisation.o MTParameterisation.o Train.o
 HEADERST = General.h Alphabet.o Instance.h DataSet.h Model.h Parameterisation.h
 
 CC	= g++
@@ -21,6 +21,9 @@ Instance.o : Instance.cpp Instance.h General.o
 	$(CC) -c $(CFLAGS) $*.cpp
 
 DataSet.o : DataSet.cpp DataSet.h General.o Alphabet.o Instance.o
+	$(CC) -c $(CFLAGS) $*.cpp
+
+Parameterisation.o : Parameterisation.cpp Parameterisation.h General.o
 	$(CC) -c $(CFLAGS) $*.cpp
 
 MTParameterisation.o : MTParameterisation.cpp Parameterisation.h General.o
