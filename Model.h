@@ -1,10 +1,11 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include <cstdlib>
-#include <cmath>
 #include "Instance.h"
 #include "Parameterisation.h"
+#include <cstdlib>
+#include <cmath>
+#include <string>
 #include <iostream>
 
 #define MAX 2500
@@ -12,7 +13,7 @@
 class Model {
  public:
   Model();
-  Model(int, int, int, int);
+  Model(int, int, int, int, const std::string& = "MT");
   Model(std::istream& is);
   ~Model();
   
@@ -30,8 +31,8 @@ class Model {
 
   void predict(Instance*);
   int getClasses() const { return NO; }
-  Float get_squared_error() const { return error; }
-  void reset_squared_error() { error = .0; }
+  Float getError() const { return error; }
+  void resetError() { error = .0; }
 
  private:
   /*
@@ -53,7 +54,8 @@ class Model {
 
    set fixed to multinomial tables until I develop a generic framework
   */
-  MTParameterisation* model; 
+  std::string ptype;
+  Parameterisation* model; 
 
   /*
     Junction tree cluster (i.e. clique) potentials

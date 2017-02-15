@@ -5,9 +5,15 @@ Model::Model() {
   NI = NO = NF = NB = -1;
 }
 
-Model::Model(int idim, int odim, int fdim, int bdim):
-  NI(idim), NO(odim), NF(fdim), NB(bdim) {
-  model = new MTParameterisation(NI, NO, NF, NB);
+Model::Model(int idim, int odim, int fdim, int bdim, const string& type):
+  NI(idim), NO(odim), NF(fdim), NB(bdim), ptype(type) {
+
+  try {
+    model = Parameterisation::factory(NI, NO, NF, NB, ptype);
+  } catch(Parameterisation::BadParameterisationCreation e) {
+    cerr << e.what() << endl;
+    exit(EXIT_FAILURE);
+  }
 
   Y = new Float[NO*MAX];
   
@@ -16,17 +22,7 @@ Model::Model(int idim, int odim, int fdim, int bdim):
 }
 
 Model::Model(istream& is) {
-  model = new MTParameterisation(is);
-  
-  NI = model->NI; // inputDim();
-  NO = model->NO; // outputDim();
-  NF = model->NF; // forwardStateDim();
-  NB = model->NB; // backwardStateDim();
-
-  Y = new Float[NO*MAX];
-  
-  allocStats();
-  resetStats();
+  read(is);
 }
 
 Model::~Model() {
@@ -37,8 +33,14 @@ Model::~Model() {
 }
 
 void Model::read(istream& is) {
-  model = new MTParameterisation();
-  model->read(is);
+  is >> ptype;
+  
+  try {
+    model = Parameterisation::factory(is, ptype);
+  } catch(Parameterisation::BadParameterisationCreation e) {
+    cerr << e.what() << endl;
+    exit(EXIT_FAILURE);
+  }
 
   NI = model->NI; // inputDim();
   NO = model->NO; // outputDim();
@@ -52,6 +54,7 @@ void Model::read(istream& is) {
 }
 
 void Model::write(ostream& os) {
+  os << ptype << endl;
   model->write(os);
 }
 
